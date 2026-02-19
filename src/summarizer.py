@@ -1,7 +1,7 @@
 """
 Claude API を使って要約・カテゴリ分け・補足要約を生成するモジュール。
 
-コスト削減のため、全ブックマークを1回の API 呼び出しでバッチ処理する。
+出力トークン上限を超えないよう、CHUNK_SIZE 件ずつ分割してAPI呼び出しを行う。
 """
 
 import json
@@ -17,6 +17,10 @@ SUMMARIZE_MODEL = "claude-sonnet-4-5"
 # 補足要約モデル（軽量）
 ENRICH_MODEL = "claude-haiku-4-5"
 
+# 1回のAPIコールで処理するブックマーク件数
+# 1件あたり出力約30トークン × 20件 = 約600トークン（余裕をもって設定）
+CHUNK_SIZE = 20
+
 # カテゴリ定義
 DEFAULT_CATEGORIES = [
     "AI・テック",
@@ -31,29 +35,16 @@ DEFAULT_CATEGORIES = [
 
 
 @with_retry(max_retries=3, base_delay=5.0)
-def categorize_and_summarize(
+def _summarize_chunk(
     client: Anthropic,
     bookmarks: list[Bookmark],
-    categories: list[str] = DEFAULT_CATEGORIES,
+    categories_str: str,
 ) -> tuple[list[dict], object]:
     """
-    全ブックマークを一度にバッチ処理してカテゴリ分け + 要約を生成する。
-
-    Args:
-        client: Anthropic クライアント
-        bookmarks: ブックマークのリスト
-        categories: カテゴリ名のリスト
-
-    Returns:
-        (summaries, usage)
-        summaries: [{"id": str, "category": str, "summary": str}, ...]
-        usage: Anthropic の usage オブジェクト
+    ブックマークのチャンク（最大 CHUNK_SIZE 件）を1回のAPIコールで要約する。
     """
-    categories_str = "・".join(categories)
-
-    # ツイート一覧のテキスト化
     tweet_list = "\n\n".join(
-        f"[ID:{bm.id}]\n@{bm.author_username} ({bm.author_name})\n{bm.text}"
+        f"[ID:{bm.id}]\n@{bm.author_username} ({bm.author_name})\n{bm.text[:300]}"
         for bm in bookmarks
     )
 
@@ -61,7 +52,7 @@ def categorize_and_summarize(
 
 各ブックマークについて:
 1. カテゴリを「{categories_str}」のいずれかに分類
-2. 日本語で2〜3文の要約を生成（元の内容を忠実に要約すること）
+2. 日本語で1〜2文の要約を生成（元の内容を忠実に要約すること）
 
 JSONのみで返してください（前後の説明・マークダウン記号は不要）:
 [
@@ -77,7 +68,7 @@ JSONのみで返してください（前後の説明・マークダウン記号�
 
     response = client.messages.create(
         model=SUMMARIZE_MODEL,
-        max_tokens=4096,
+        max_tokens=2048,
         messages=[{"role": "user", "content": prompt}],
     )
 
@@ -92,17 +83,67 @@ JSONのみで返してください（前後の説明・マークダウン記号�
         summaries = json.loads(result_text)
     except json.JSONDecodeError as e:
         # フォールバック: リスト部分だけ抽出
-        match = re.search(r"\[.*\]", result_text, re.DOTALL)
+        match = re.search(r"\[.*?\]", result_text, re.DOTALL)
         if match:
-            summaries = json.loads(match.group())
+            try:
+                summaries = json.loads(match.group())
+            except json.JSONDecodeError:
+                # それでも失敗した場合はこのチャンクをデフォルト値で埋める
+                logger.warning(f"チャンクのJSONパース失敗。デフォルト値を使用します。")
+                summaries = [
+                    {"id": bm.id, "category": "その他", "summary": bm.text[:80] + "…"}
+                    for bm in bookmarks
+                ]
         else:
-            raise ValueError(f"JSON パースに失敗しました: {e}\n{result_text[:500]}")
+            logger.warning(f"チャンクのJSONパース失敗。デフォルト値を使用します。")
+            summaries = [
+                {"id": bm.id, "category": "その他", "summary": bm.text[:80] + "…"}
+                for bm in bookmarks
+            ]
+
+    return summaries, response.usage
+
+
+def categorize_and_summarize(
+    client: Anthropic,
+    bookmarks: list[Bookmark],
+    categories: list[str] = DEFAULT_CATEGORIES,
+) -> tuple[list[dict], object]:
+    """
+    全ブックマークを CHUNK_SIZE 件ずつ分割して要約・カテゴリ分けを行う。
+
+    Returns:
+        (summaries, usage)
+        summaries: [{"id": str, "category": str, "summary": str}, ...]
+        usage: 合計トークン使用量（疑似オブジェクト）
+    """
+    categories_str = "・".join(categories)
+    all_summaries: list[dict] = []
+    total_input = 0
+    total_output = 0
+
+    # CHUNK_SIZE 件ずつ分割
+    chunks = [bookmarks[i:i + CHUNK_SIZE] for i in range(0, len(bookmarks), CHUNK_SIZE)]
+    logger.info(f"要約を {len(chunks)} チャンクに分割して処理します（{CHUNK_SIZE}件/チャンク）")
+
+    for idx, chunk in enumerate(chunks, 1):
+        logger.info(f"  チャンク {idx}/{len(chunks)} ({len(chunk)}件) を処理中...")
+        summaries, usage = _summarize_chunk(client, chunk, categories_str)
+        all_summaries.extend(summaries)
+        total_input += usage.input_tokens
+        total_output += usage.output_tokens
 
     logger.info(
-        f"要約生成完了: {len(summaries)} 件 | "
-        f"トークン: input={response.usage.input_tokens}, output={response.usage.output_tokens}"
+        f"要約生成完了: {len(all_summaries)} 件 | "
+        f"トークン合計: input={total_input}, output={total_output}"
     )
-    return summaries, response.usage
+
+    # usage の合計を疑似オブジェクトで返す
+    class _Usage:
+        input_tokens = total_input
+        output_tokens = total_output
+
+    return all_summaries, _Usage()
 
 
 @with_retry(max_retries=2, base_delay=3.0)
