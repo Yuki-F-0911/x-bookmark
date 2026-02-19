@@ -156,30 +156,59 @@ def _parse_json_item(item: dict) -> Optional[Bookmark]:
     )
 
 
+def _extract_tweet_id_from_url(url: str) -> str:
+    """URL からツイートIDを抽出する。例: https://x.com/user/status/12345 → '12345'"""
+    import re
+    match = re.search(r"/status/(\d+)", url)
+    return match.group(1) if match else ""
+
+
 def _load_from_csv(filepath: str) -> list[Bookmark]:
-    """CSV形式のブックマークファイルを読み込む（汎用対応）"""
+    """
+    CSV形式のブックマークファイルを読み込む。
+
+    X Bookmarks Exporter の CSV 形式:
+      Text, DisplayName, Username, Timestamp, Link
+    汎用形式:
+      id/tweet_id, text/content, screen_name/username, created_at/timestamp, url/tweet_url
+    """
     bookmarks: list[Bookmark] = []
     with open(filepath, "r", encoding="utf-8-sig", newline="") as f:
         reader = csv.DictReader(f)
         for row in reader:
+            # --- X Bookmarks Exporter 形式 (Text, DisplayName, Username, Timestamp, Link) ---
+            link = (row.get("Link") or row.get("link") or "").strip()
             tweet_id = (
-                row.get("id") or row.get("tweet_id") or row.get("ID") or ""
+                row.get("id") or row.get("tweet_id") or row.get("ID") or
+                _extract_tweet_id_from_url(link) or
+                ""
             ).strip()
             if not tweet_id:
                 continue
 
-            text = (row.get("text") or row.get("content") or row.get("Text") or "").strip()
-            author_username = (
-                row.get("screen_name") or row.get("username") or row.get("author_username") or "unknown"
+            text = (
+                row.get("Text") or row.get("text") or
+                row.get("content") or row.get("Content") or ""
             ).strip()
+
+            # Username: "@handle" 形式の @ を除去
+            raw_username = (
+                row.get("Username") or row.get("username") or
+                row.get("screen_name") or "unknown"
+            ).strip()
+            author_username = raw_username.lstrip("@")
+
             author_name = (
+                row.get("DisplayName") or row.get("display_name") or
                 row.get("name") or row.get("author_name") or author_username
             ).strip()
-            url = (
-                row.get("url") or row.get("tweet_url") or
-                f"https://x.com/{author_username}/status/{tweet_id}"
-            ).strip()
-            created_at = _parse_datetime(row.get("created_at") or row.get("timestamp"))
+
+            url = link or f"https://x.com/{author_username}/status/{tweet_id}"
+
+            created_at = _parse_datetime(
+                row.get("Timestamp") or row.get("timestamp") or
+                row.get("created_at") or row.get("CreatedAt")
+            )
 
             bookmarks.append(Bookmark(
                 id=tweet_id,
@@ -218,8 +247,16 @@ def load_bookmarks(filepath: str) -> list[Bookmark]:
         logger.info(f"ブックマークファイルが空です（0バイト）: {filepath}")
         return []
 
+    # 拡張子だけでなく内容の先頭文字でも判別する
+    # （.json でも CSV が入っている場合があるため）
+    with open(filepath, "r", encoding="utf-8-sig") as f:
+        first_char = f.read(1).strip()
+
     ext = os.path.splitext(filepath)[1].lower()
-    if ext == ".csv":
+    is_csv = ext == ".csv" or (first_char not in ("[", "{") and first_char != "")
+
+    if is_csv:
+        logger.info("CSV形式として読み込みます")
         bookmarks = _load_from_csv(filepath)
     else:
         bookmarks = _load_from_json(filepath)
