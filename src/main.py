@@ -79,6 +79,8 @@ def run_digest(
     bookmarks_file: str = BOOKMARKS_FILE,
     processed_ids_file: str = PROCESSED_IDS_FILE,
     dry_run: bool = False,
+    max_items: int = 30,
+    skip_enrich: bool = False,
 ) -> None:
     """
     メインパイプラインを実行する。
@@ -109,14 +111,23 @@ def run_digest(
             logger.info("新規ブックマークがありません。処理を終了します。")
             sys.exit(0)
 
+        # 上限件数に切り詰め（新しい順に max_items 件のみ処理）
+        if len(bookmarks) > max_items:
+            logger.info(f"{len(bookmarks)} 件中、直近 {max_items} 件のみ処理します")
+            bookmarks = bookmarks[:max_items]
+
         logger.info(f"新規ブックマーク {len(bookmarks)} 件を処理します")
 
         # --- 3. Anthropic クライアント初期化 ---
         anthropic_client = Anthropic(api_key=anthropic_api_key)
 
         # --- 4. Web検索エンリッチメント ---
-        logger.info("Web検索でエンリッチメントを開始します...")
-        enrichment_data = enrich_all_bookmarks(anthropic_client, bookmarks)
+        if skip_enrich:
+            logger.info("エンリッチメントをスキップします (--skip-enrich)")
+            enrichment_data = {bm.id: ([], []) for bm in bookmarks}
+        else:
+            logger.info("Web検索でエンリッチメントを開始します...")
+            enrichment_data = enrich_all_bookmarks(anthropic_client, bookmarks)
 
         # --- 5. 要約・カテゴリ分け ---
         logger.info("Claude API で要約・カテゴリ分けを開始します...")
@@ -194,6 +205,18 @@ if __name__ == "__main__":
         action="store_true",
         help="処理済みIDキャッシュを無視して全件処理",
     )
+    parser.add_argument(
+        "--max-items",
+        type=int,
+        default=int(os.environ.get("MAX_ITEMS", "30")),
+        help="1回の実行で処理するブックマークの最大件数 (default: 30)",
+    )
+    parser.add_argument(
+        "--skip-enrich",
+        action="store_true",
+        default=os.environ.get("SKIP_ENRICH", "").lower() in ("1", "true"),
+        help="Web検索エンリッチメントをスキップして高速化",
+    )
     args = parser.parse_args()
 
     # --no-cache の場合は空のキャッシュファイルとして扱う
@@ -206,4 +229,6 @@ if __name__ == "__main__":
         bookmarks_file=args.bookmarks,
         processed_ids_file=proc_file,
         dry_run=args.dry_run,
+        max_items=args.max_items,
+        skip_enrich=args.skip_enrich,
     )

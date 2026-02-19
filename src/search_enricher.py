@@ -20,7 +20,7 @@ MAX_WEB_RESULTS = 3
 # キーワード抽出数
 MAX_KEYWORDS = 3
 # 検索間隔（DuckDuckGo へのリクエスト過多を避けるため）
-SEARCH_INTERVAL_SEC = 1.5
+SEARCH_INTERVAL_SEC = 0.5  # 1.5→0.5秒に短縮
 
 
 def extract_keywords(
@@ -158,15 +158,9 @@ def enrich_bookmark(
 
     logger.info(f"キーワード: {keywords} (id={bookmark.id})")
 
-    # 一般Web検索
+    # 一般Web検索（x.com絞り込みは無効化してリクエスト数削減）
     query = " ".join(keywords)
     web_results = search_duckduckgo(query, max_results=MAX_WEB_RESULTS)
-
-    # 結果が少なければ X.com 絞り込みも試みる
-    if use_x_search and len(web_results) < 2:
-        x_results = search_xcom_via_web(keywords, max_results=2)
-        web_results.extend(x_results)
-        web_results = web_results[:MAX_WEB_RESULTS]
 
     time.sleep(SEARCH_INTERVAL_SEC)  # レート制限回避
     return keywords, web_results
