@@ -55,7 +55,14 @@ def _load_from_json(filepath: str) -> list[Bookmark]:
       3. シンプル形式: [{id, text, author_name, author_username, url}]
     """
     with open(filepath, "r", encoding="utf-8") as f:
-        data = json.load(f)
+        content = f.read().strip()
+
+    # ファイルが空の場合は空リストとして扱う
+    if not content:
+        logger.info(f"ブックマークファイルが空です: {filepath}")
+        return []
+
+    data = json.loads(content)
 
     if not isinstance(data, list):
         raise ValueError(f"JSONはリスト形式である必要があります。ファイル: {filepath}")
@@ -205,6 +212,11 @@ def load_bookmarks(filepath: str) -> list[Bookmark]:
             f"ブックマークファイルが見つかりません: {filepath}\n"
             f"X Bookmarks Exporter でエクスポートした JSON を {filepath} に配置してください。"
         )
+
+    # ファイルサイズが0の場合は空リストを返す
+    if os.path.getsize(filepath) == 0:
+        logger.info(f"ブックマークファイルが空です（0バイト）: {filepath}")
+        return []
 
     ext = os.path.splitext(filepath)[1].lower()
     if ext == ".csv":

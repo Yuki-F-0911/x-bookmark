@@ -40,7 +40,22 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: Check bookmarks.json exists and is not empty
+        id: check_bookmarks
+        run: |
+          if [ ! -f "bookmarks.json" ]; then
+            echo "bookmarks.json が存在しません。スキップします。"
+            echo "skip=true" >> $GITHUB_OUTPUT
+          elif [ ! -s "bookmarks.json" ]; then
+            echo "bookmarks.json が空です。スキップします。"
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "bookmarks.json を確認しました。処理を続行します。"
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Run digest
+        if: steps.check_bookmarks.outputs.skip != 'true'
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
