@@ -1,0 +1,77 @@
+[
+  {
+    "id": "1234567890123456789",
+    "text": "Claude 3.5 Sonnetがリリースされました。コーディング能力が大幅に向上し、特にエージェント型タスクで圧倒的なパフォーマンスを発揮します。APIは今すぐ利用可能です。 https://anthropic.com/claude",
+    "user": {
+      "name": "Anthropic",
+      "screen_name": "AnthropicAI"
+    },
+    "created_at": "2026-02-19T03:00:00.000Z",
+    "url": "https://twitter.com/AnthropicAI/status/1234567890123456789",
+    "public_metrics": {
+      "like_count": 12500,
+      "retweet_count": 3200,
+      "reply_count": 890
+    }
+  },
+  {
+    "id": "9876543210987654321",
+    "text": "スタートアップが最初の100人のユーザーを獲得するための5つの戦略：\n1. コミュニティから始める\n2. ハンドスケール\n3. ニッチに特化\n4. 既存のプラットフォームを活用\n5. 口コミを設計する\n詳しくはブログで→",
+    "user": {
+      "name": "田中一郎",
+      "screen_name": "tanaka_startup"
+    },
+    "created_at": "2026-02-18T12:30:00.000Z",
+    "url": "https://twitter.com/tanaka_startup/status/9876543210987654321",
+    "public_metrics": {
+      "like_count": 3400,
+      "retweet_count": 890,
+      "reply_count": 120
+    }
+  },
+  {
+    "id": "1111222233334444555",
+    "text": "400mハードルの世界記録保持者が語るトレーニング哲学：「スピードは練習で作れる。しかしリズム感は日々の積み重ねでしか磨けない。」低強度の技術練習を欠かさない理由がここにある。",
+    "user": {
+      "name": "Athletics Weekly",
+      "screen_name": "AthleticsWeekly"
+    },
+    "created_at": "2026-02-17T08:00:00.000Z",
+    "url": "https://twitter.com/AthleticsWeekly/status/1111222233334444555",
+    "public_metrics": {
+      "like_count": 2100,
+      "retweet_count": 450,
+      "reply_count": 67
+    }
+  },
+  {
+    "id": "5555444433332222111",
+    "text": "AI時代のマーケティング変革：\n- パーソナライゼーションが超精細化\n- コンテンツ制作コストが1/10に\n- A/Bテストがリアルタイム化\n- 顧客インサイトの取得速度が10倍\nでも最終的に重要なのは「人を動かす物語」を作れるかどうか。",
+    "user": {
+      "name": "マーケ研究所",
+      "screen_name": "marketing_lab_jp"
+    },
+    "created_at": "2026-02-19T06:00:00.000Z",
+    "url": "https://twitter.com/marketing_lab_jp/status/5555444433332222111",
+    "public_metrics": {
+      "like_count": 5600,
+      "retweet_count": 1200,
+      "reply_count": 230
+    }
+  },
+  {
+    "id": "6666777788889999000",
+    "text": "独学で英語をマスターした人たちに共通するのは「毎日少しずつ」ではなく「毎日必ず」だった。30分か5分かは関係ない。ゼロにしないことが全て。この原則はあらゆる学習に当てはまる。",
+    "user": {
+      "name": "学習ハック研究家",
+      "screen_name": "learning_hacker"
+    },
+    "created_at": "2026-02-18T20:00:00.000Z",
+    "url": "https://twitter.com/learning_hacker/status/6666777788889999000",
+    "public_metrics": {
+      "like_count": 18900,
+      "retweet_count": 4500,
+      "reply_count": 380
+    }
+  }
+]

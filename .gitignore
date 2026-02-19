@@ -1,0 +1,19 @@
+# 環境変数（APIキーを含むため絶対にコミットしない）
+.env
+
+# 処理済みIDキャッシュ（GitHubがActions経由で自動更新するので手動コミット不要）
+# ※ Actions が自動コミットするため、ローカルでは無視してOK
+# processed_ids.json
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+*.egg-info/
+dist/
+build/
+
+# OS
+.DS_Store
+Thumbs.db

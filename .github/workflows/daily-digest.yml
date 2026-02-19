@@ -1,0 +1,75 @@
+name: X Bookmark Daily Digest
+
+on:
+  # bookmarks.json が更新されたら即座に実行
+  push:
+    paths:
+      - "bookmarks.json"
+
+  # 毎日 JST 7:00（UTC 22:00 前日）にも実行
+  schedule:
+    - cron: "0 22 * * *"
+
+  # 手動実行ボタン
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Slack送信をスキップ（テスト用）"
+        type: boolean
+        default: false
+      no_cache:
+        description: "処理済みIDキャッシュを無視して全件処理"
+        type: boolean
+        default: false
+
+jobs:
+  digest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run digest
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          ARGS=""
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            ARGS="$ARGS --dry-run"
+          fi
+          if [ "${{ github.event.inputs.no_cache }}" = "true" ]; then
+            ARGS="$ARGS --no-cache"
+          fi
+          python -m src.main $ARGS
+
+      # 処理済みIDキャッシュを自動コミットして保存
+      - name: Save processed IDs cache
+        if: success() && github.event.inputs.dry_run != 'true'
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add processed_ids.json || true
+          git diff --staged --quiet || git commit -m "chore: update processed_ids cache [skip ci]"
+          git push || true
+
+      # 失敗時に Slack にエラー通知
+      - name: Notify failure to Slack
+        if: failure()
+        run: |
+          curl -s -X POST "${{ secrets.SLACK_WEBHOOK_URL }}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "text": ":red_circle: *X Bookmark Digest が失敗しました*\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|GitHub Actions ログを確認>"
+            }'
