@@ -184,7 +184,7 @@ def _save_digest_cache(result: DigestResult) -> None:
             {
                 "id": bm.bookmark.id,
                 "author_username": bm.bookmark.author_username,
-                "author_display_name": bm.bookmark.author_display_name,
+                "author_display_name": bm.bookmark.author_name,
                 "text": bm.bookmark.text,
                 "url": bm.bookmark.url,
                 "like_count": bm.bookmark.like_count,
