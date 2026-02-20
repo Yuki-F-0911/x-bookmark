@@ -14,6 +14,13 @@ __pycache__/
 dist/
 build/
 
+# Watcher
+.last_csv_hash
+watcher.log
+
+# Cloudflare
+slack_gateway/.wrangler/
+
 # OS
 .DS_Store
 Thumbs.db

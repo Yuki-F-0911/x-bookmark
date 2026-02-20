@@ -4,18 +4,24 @@ X Bookmarks CSV 自動Push スクリプト
 Chrome拡張 "X Bookmarks Exporter" がDownloadsフォルダにCSVを保存したら
 自動的にgit pushしてGitHub Actionsをトリガーする。
 
+重複防止:
+  - CSVの内容ハッシュを記録し、内容が同じなら再pushしない
+  - 起動時にリモートからpullして processed_ids.json を同期
+  - git diff --staged で変更がなければスキップ
+
 使い方:
   python watcher.py
 
 設定:
   WATCH_DIR    : 監視するフォルダ（デフォルト: ~/Downloads）
   REPO_DIR     : このリポジトリのパス（デフォルト: スクリプトと同じフォルダ）
-  CSV_PATTERN  : 対象ファイル名のパターン（デフォルト: twitter_bookmarks*.csv）
+  CSV_PATTERN  : 対象ファイル名のパターン（デフォルト: bookmarks*.csv）
 """
 
 import os
 import sys
 import time
+import hashlib
 import shutil
 import subprocess
 import glob
@@ -27,8 +33,9 @@ from datetime import datetime
 WATCH_DIR = Path(os.environ.get("WATCH_DIR", Path.home() / "Downloads"))
 REPO_DIR  = Path(os.environ.get("REPO_DIR",  Path(__file__).parent))
 CSV_PATTERN = os.environ.get("CSV_PATTERN", "bookmarks*.csv")
-DEST_FILE   = REPO_DIR / "bookmarks.json"   # .jsonという名前でCSVを保存（既存の命名に合わせる）
-CHECK_INTERVAL_SEC = 10                      # 監視間隔（秒）
+DEST_FILE   = REPO_DIR / "bookmarks.json"
+HASH_FILE   = REPO_DIR / ".last_csv_hash"
+CHECK_INTERVAL_SEC = 10
 # ────────────────────────────────────────────────────
 
 logging.basicConfig(
@@ -49,16 +56,29 @@ def find_latest_csv() -> Path | None:
     files = glob.glob(pattern)
     if not files:
         return None
-    # 更新日時が最新のファイルを返す
     return Path(max(files, key=os.path.getmtime))
 
 
-def get_mtime(path: Path) -> float:
-    """ファイルのmtimeを返す（存在しなければ0）"""
+def file_hash(path: Path) -> str:
+    """ファイルの内容ハッシュ（SHA256）を返す"""
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(8192), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def load_last_hash() -> str:
+    """前回処理したCSVのハッシュを読み込む"""
     try:
-        return path.stat().st_mtime
+        return HASH_FILE.read_text(encoding="utf-8").strip()
     except FileNotFoundError:
-        return 0.0
+        return ""
+
+
+def save_last_hash(h: str) -> None:
+    """CSVのハッシュを保存"""
+    HASH_FILE.write_text(h, encoding="utf-8")
 
 
 def run_git(args: list[str]) -> tuple[int, str]:
@@ -73,6 +93,15 @@ def run_git(args: list[str]) -> tuple[int, str]:
     return result.returncode, (result.stdout + result.stderr).strip()
 
 
+def sync_remote() -> None:
+    """リモートの変更（processed_ids.json等）をpullして同期"""
+    code, out = run_git(["pull", "--rebase", "origin", "main"])
+    if code == 0:
+        logger.info("リモートと同期しました")
+    else:
+        logger.warning(f"リモート同期に失敗（後続で再試行）: {out}")
+
+
 def push_to_github(csv_path: Path) -> bool:
     """
     CSVをbookmarks.jsonとしてコピーしてgit push。
@@ -80,22 +109,20 @@ def push_to_github(csv_path: Path) -> bool:
     """
     logger.info(f"新しいCSVを検出: {csv_path.name}")
 
+    # リモートから最新を取得（processed_ids.json等の競合防止）
+    sync_remote()
+
     # コピー
     shutil.copy2(csv_path, DEST_FILE)
-    logger.info(f"コピー完了: {csv_path.name} → {DEST_FILE.name}")
+    logger.info(f"コピー完了: {csv_path.name} -> {DEST_FILE.name}")
 
-    # git操作
-    steps = [
-        (["add", "bookmarks.json"], "git add"),
-        (["diff", "--staged", "--quiet"], "変更確認"),  # 変更なしなら終了
-    ]
-
+    # git add
     code, out = run_git(["add", "bookmarks.json"])
     if code != 0:
         logger.error(f"git add 失敗: {out}")
         return False
 
-    # 差分がなければスキップ
+    # 差分がなければスキップ（内容が完全に同じ場合）
     code, _ = run_git(["diff", "--staged", "--quiet"])
     if code == 0:
         logger.info("bookmarks.jsonに変更なし。pushをスキップします。")
@@ -109,7 +136,7 @@ def push_to_github(csv_path: Path) -> bool:
         return False
     logger.info(f"git commit: {out.splitlines()[0] if out else 'OK'}")
 
-    # push（remote が ahead の場合はrebase）
+    # push
     code, out = run_git(["push", "origin", "main"])
     if code != 0:
         logger.warning(f"push失敗、rebaseを試みます: {out}")
@@ -122,34 +149,41 @@ def push_to_github(csv_path: Path) -> bool:
             logger.error(f"再push失敗: {out}")
             return False
 
-    logger.info("✅ GitHubへのpushが完了しました。GitHub Actionsがトリガーされます。")
+    logger.info("GitHubへのpushが完了しました。GitHub Actionsがトリガーされます。")
     return True
 
 
 def main():
     logger.info("=" * 50)
-    logger.info(f"X Bookmarks Watcher 起動")
+    logger.info("X Bookmarks Watcher 起動")
     logger.info(f"  監視フォルダ : {WATCH_DIR}")
     logger.info(f"  対象パターン : {CSV_PATTERN}")
     logger.info(f"  リポジトリ   : {REPO_DIR}")
     logger.info(f"  監視間隔     : {CHECK_INTERVAL_SEC}秒")
     logger.info("=" * 50)
 
-    last_processed_mtime = 0.0
+    # 起動時にリモートと同期
+    sync_remote()
+
+    last_hash = load_last_hash()
+    if last_hash:
+        logger.info(f"前回のCSVハッシュ: {last_hash[:16]}...")
 
     while True:
         try:
             csv_path = find_latest_csv()
 
             if csv_path is not None:
-                mtime = get_mtime(csv_path)
-                if mtime > last_processed_mtime:
-                    # 新しいファイルを検出
+                current_hash = file_hash(csv_path)
+
+                if current_hash != last_hash:
+                    # 内容が変わったCSVを検出
                     success = push_to_github(csv_path)
                     if success:
-                        last_processed_mtime = mtime
+                        save_last_hash(current_hash)
+                        last_hash = current_hash
                     else:
-                        logger.error("push失敗。次の検出時に再試行します。")
+                        logger.error("push失敗。次回再試行します。")
 
         except KeyboardInterrupt:
             logger.info("終了します (Ctrl+C)")
