@@ -14,6 +14,7 @@ X Bookmark Daily Digest - メインエントリポイント
 
 import os
 import sys
+import json
 import traceback
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
@@ -152,7 +153,10 @@ def run_digest(
             logger.info("Slack に送信します...")
             send_to_slack(slack_webhook_url, result)
 
-        # --- 8. 処理済みID保存 ---
+        # --- 8. ダイジェストキャッシュ保存（Slack Bot 用）---
+        _save_digest_cache(result)
+
+        # --- 9. 処理済みID保存 ---
         new_ids = {bm.bookmark.id for bm in enriched_bookmarks}
         save_processed_ids(new_ids, processed_ids_file)
 
@@ -168,6 +172,38 @@ def run_digest(
         logger.error(f"予期しないエラーが発生しました:\n{error_detail}")
         send_error_to_slack(slack_webhook_url, f"{type(e).__name__}: {e}")
         sys.exit(1)
+
+
+def _save_digest_cache(result: DigestResult) -> None:
+    """Slack Bot が参照できるようダイジェスト内容をJSONファイルに保存する"""
+    cache_file = os.environ.get("DIGEST_CACHE_FILE", "digest_cache.json")
+    data = {
+        "date": result.date.strftime("%Y-%m-%d"),
+        "total_count": result.total_count,
+        "bookmarks": [
+            {
+                "id": bm.bookmark.id,
+                "author_username": bm.bookmark.author_username,
+                "author_display_name": bm.bookmark.author_display_name,
+                "text": bm.bookmark.text,
+                "url": bm.bookmark.url,
+                "like_count": bm.bookmark.like_count,
+                "category": bm.category,
+                "summary": bm.summary,
+                "importance": bm.importance,
+                "keywords": bm.keywords,
+                "enrichment_summary": bm.enrichment_summary,
+                "web_results": [
+                    {"title": r.title, "url": r.url, "snippet": r.snippet}
+                    for r in bm.web_results
+                ],
+            }
+            for bm in result.bookmarks
+        ],
+    }
+    with open(cache_file, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+    logger.info(f"ダイジェストキャッシュを保存しました: {cache_file}")
 
 
 def _print_digest_summary(result: DigestResult) -> None:

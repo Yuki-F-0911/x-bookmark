@@ -1,0 +1,71 @@
+name: Slack Bot (Digest Q&A)
+
+# Slack AppからのWebhookで起動（repository_dispatch）
+on:
+  repository_dispatch:
+    types: [slack-mention]
+
+  # テスト用手動実行
+  workflow_dispatch:
+    inputs:
+      question:
+        description: "Claudeへの質問"
+        type: string
+        default: "今日の重要なブックマークをまとめて"
+      channel:
+        description: "SlackチャンネルID"
+        type: string
+        default: ""
+      thread_ts:
+        description: "Slackスレッドts"
+        type: string
+        default: ""
+
+jobs:
+  answer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Check digest cache exists
+        id: check_cache
+        run: |
+          if [ -f "digest_cache.json" ]; then
+            echo "cache_exists=true" >> $GITHUB_OUTPUT
+            echo "✅ ダイジェストキャッシュが見つかりました"
+          else
+            echo "cache_exists=false" >> $GITHUB_OUTPUT
+            echo "⚠️ ダイジェストキャッシュが見つかりません"
+          fi
+
+      - name: Answer question via Claude
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          SLACK_BOT_TOKEN:   ${{ secrets.SLACK_BOT_TOKEN }}
+        run: |
+          # repository_dispatch の場合は event payload から取得
+          # workflow_dispatch の場合は inputs から取得
+          QUESTION="${{ github.event.client_payload.question || github.event.inputs.question }}"
+          CHANNEL="${{ github.event.client_payload.channel || github.event.inputs.channel }}"
+          THREAD="${{ github.event.client_payload.thread_ts || github.event.inputs.thread_ts }}"
+
+          echo "質問: $QUESTION"
+          echo "チャンネル: $CHANNEL"
+          echo "スレッド: $THREAD"
+
+          python -m src.slack_bot \
+            --question "$QUESTION" \
+            --channel  "$CHANNEL" \
+            --thread   "$THREAD"

@@ -1,0 +1,9 @@
+name = "x-bookmark-slack-gateway"
+main = "worker.js"
+compatibility_date = "2024-01-01"
+
+# 環境変数はCloudflare Dashboardで設定:
+#   SLACK_BOT_TOKEN
+#   SLACK_SIGNING_SECRET
+#   GITHUB_TOKEN
+#   GITHUB_REPO
