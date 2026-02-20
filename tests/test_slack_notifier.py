@@ -79,11 +79,42 @@ class TestBuildDigestBlocks:
         assert len(blocks) <= 50
 
     def test_includes_category_section(self):
-        blocks = build_digest_blocks(make_digest())
-        # カテゴリヘッダーが含まれることを確認
-        headers = [b for b in blocks if b.get("type") == "header"]
-        category_headers = [h for h in headers if "AI・テック" in h["text"]["text"]]
-        assert len(category_headers) >= 1
+        # normalのブックマークを使ってカテゴリが表示されることを確認
+        bm = make_enriched_bookmark(category="AI・テック")
+        bm.importance = "normal"
+        blocks = build_digest_blocks(make_digest([bm]))
+        # 新レイアウト: カテゴリはsectionのmrkdwnテキスト内に含まれる
+        all_text = " ".join(
+            b.get("text", {}).get("text", "") if isinstance(b.get("text"), dict)
+            else str(b.get("text", ""))
+            for b in blocks
+        )
+        assert "AI・テック" in all_text
+
+    def test_high_importance_shown_first(self):
+        """high importanceのブックマークが先頭セクションに表示されることを確認"""
+        bm = make_enriched_bookmark(category="AI・テック")
+        bm.importance = "high"
+        blocks = build_digest_blocks(make_digest([bm]))
+        # 重要ピックアップセクションが存在するか
+        all_text = " ".join(
+            b.get("text", {}).get("text", "") if isinstance(b.get("text"), dict)
+            else ""
+            for b in blocks
+        )
+        assert "重要ピックアップ" in all_text
+
+    def test_low_importance_shown_as_summary(self):
+        """low importanceのブックマークがまとめ行に表示されることを確認"""
+        bm = make_enriched_bookmark()
+        bm.importance = "low"
+        blocks = build_digest_blocks(make_digest([bm]))
+        all_text = " ".join(
+            b.get("text", {}).get("text", "") if isinstance(b.get("text"), dict)
+            else ""
+            for b in blocks
+        )
+        assert "内容薄" in all_text
 
 
 class TestTruncate:

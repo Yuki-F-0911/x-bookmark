@@ -44,24 +44,19 @@ def _summarize_chunk(
     ブックマークのチャンク（最大 CHUNK_SIZE 件）を1回のAPIコールで要約する。
     """
     tweet_list = "\n\n".join(
-        f"[ID:{bm.id}]\n@{bm.author_username} ({bm.author_name})\n{bm.text[:300]}"
+        f"[ID:{bm.id}]\n@{bm.author_username}\n{bm.text[:300] if bm.text else '（本文なし）'}"
         for bm in bookmarks
     )
 
     prompt = f"""以下のXブックマーク一覧を分析してください。
 
-各ブックマークについて:
-1. カテゴリを「{categories_str}」のいずれかに分類
-2. 日本語で1〜2文の要約を生成（元の内容を忠実に要約すること）
+各ブックマークについて以下の3点を判定してJSON配列で返してください:
+1. **importance**: "high"（実用的な知識・ノウハウ・重要ニュース）/ "normal"（一般的な情報）/ "low"（本文なし・内容が薄い・単なる感想のみ）
+2. **category**: 「{categories_str}」のいずれかに分類
+3. **summary**: 日本語で1文の要約。"low"の場合は "（内容なし）" とする
 
-JSONのみで返してください（前後の説明・マークダウン記号は不要）:
-[
-  {{
-    "id": "ツイートID",
-    "category": "カテゴリ名",
-    "summary": "要約文"
-  }}
-]
+JSONのみで返してください（説明不要）:
+[{{"id":"ID","importance":"high/normal/low","category":"カテゴリ","summary":"要約"}}]
 
 ブックマーク一覧:
 {tweet_list}"""
@@ -238,6 +233,7 @@ def build_enriched_bookmarks(
             bookmark=bookmark,
             category=summary_data.get("category", "その他"),
             summary=summary_data.get("summary", bookmark.text[:100] + "…"),
+            importance=summary_data.get("importance", "normal"),
             keywords=keywords,
             web_results=web_results,
             enrichment_summary=enrichment_summary,

@@ -1,5 +1,10 @@
 """
 Slack Incoming Webhook に Block Kit 形式でメッセージを送信するモジュール。
+
+表示方針:
+  - high importance  → 先頭にまとめて表示。要約 + Web補足 + リンク
+  - normal importance → カテゴリ別にコンパクト表示
+  - low importance   → 末尾に件数のみ（リンク一覧）
 """
 
 import requests
@@ -10,10 +15,9 @@ from .utils import get_logger
 
 logger = get_logger(__name__)
 
-SLACK_TIMEOUT = 10  # 秒
-MAX_BLOCKS_PER_MESSAGE = 50  # Slack Block Kit の上限
+SLACK_TIMEOUT = 10
+MAX_BLOCKS_PER_MESSAGE = 50
 
-# カテゴリ別絵文字マップ
 CATEGORY_EMOJI: dict[str, str] = {
     "AI・テック": "🤖",
     "ビジネス・経営": "💼",
@@ -24,6 +28,7 @@ CATEGORY_EMOJI: dict[str, str] = {
     "エンタメ・カルチャー": "🎭",
     "その他": "📌",
 }
+IMPORTANCE_LABEL = {"high": "🔴", "normal": "🔵", "low": "⚫"}
 
 
 def _emoji(category: str) -> str:
@@ -31,147 +36,113 @@ def _emoji(category: str) -> str:
 
 
 def _truncate(text: str, max_len: int = 200) -> str:
-    """テキストを指定文字数に切り詰める"""
     if len(text) <= max_len:
         return text
     return text[:max_len - 1] + "…"
 
 
-def _build_bookmark_block(bm: EnrichedBookmark) -> dict:
-    """
-    1件のブックマークを Slack Section ブロックに変換する。
-
-    形式:
-    *<URL|@username>* (👍 123)
-    要約テキスト
-    > _補足情報_
-    🔗 関連: [タイトル](url)
-    """
-    # ヘッダー行: リンク + いいね数
-    like_str = ""
-    if bm.bookmark.like_count > 0:
-        like_str = f" 👍 {bm.bookmark.like_count:,}"
-
-    header = f"*<{bm.bookmark.url}|@{bm.bookmark.author_username}>*{like_str}"
-
-    # 要約本文
-    summary = _truncate(bm.summary, 300)
-
-    # 補足情報（blockquote形式）
-    enrichment = ""
-    if bm.enrichment_summary:
-        enrichment = f"\n> _{_truncate(bm.enrichment_summary, 200)}_"
-
-    # 関連Webリンク（最大2件）
+def _build_high_block(bm: EnrichedBookmark) -> dict:
+    """high importance 用の詳細ブロック"""
+    like_str = f"  👍 {bm.bookmark.like_count:,}" if bm.bookmark.like_count > 0 else ""
+    cat = f"{_emoji(bm.category)} {bm.category}"
+    header = f"🔴 *<{bm.bookmark.url}|@{bm.bookmark.author_username}>*{like_str}  _{cat}_"
+    summary = _truncate(bm.summary, 250)
+    enrichment = f"\n> _{_truncate(bm.enrichment_summary, 180)}_" if bm.enrichment_summary else ""
     web_links = ""
     if bm.web_results:
-        links = []
-        for wr in bm.web_results[:2]:
-            if wr.url and wr.title:
-                links.append(f"<{wr.url}|{_truncate(wr.title, 50)}>")
+        links = [f"<{r.url}|{_truncate(r.title, 40)}>" for r in bm.web_results[:2] if r.url and r.title]
         if links:
-            web_links = "\n🔗 関連: " + " / ".join(links)
-
+            web_links = "\n🔗 " + "  /  ".join(links)
     text = f"{header}\n{summary}{enrichment}{web_links}"
-
-    return {
-        "type": "section",
-        "text": {
-            "type": "mrkdwn",
-            "text": text[:3000],  # Slack の text 上限: 3000文字
-        },
-    }
+    return {"type": "section", "text": {"type": "mrkdwn", "text": text[:3000]}}
 
 
-def _build_category_blocks(
-    category: str,
-    bookmarks: list[EnrichedBookmark],
-) -> list[dict]:
-    """カテゴリのヘッダー + ブックマーク一覧のブロックを生成する"""
-    emoji = _emoji(category)
-    blocks: list[dict] = [
-        {
-            "type": "header",
-            "text": {
-                "type": "plain_text",
-                "text": f"{emoji} {category}（{len(bookmarks)}件）",
-                "emoji": True,
-            },
-        }
-    ]
-    for bm in bookmarks:
-        blocks.append(_build_bookmark_block(bm))
-    blocks.append({"type": "divider"})
-    return blocks
+def _build_normal_block(bm: EnrichedBookmark) -> str:
+    """normal importance 用の1行テキスト（複数件をまとめてsectionに入れる）"""
+    like_str = f" 👍{bm.bookmark.like_count:,}" if bm.bookmark.like_count > 0 else ""
+    summary = _truncate(bm.summary, 120)
+    return f"• <{bm.bookmark.url}|@{bm.bookmark.author_username}>{like_str} — {summary}"
 
 
 def build_digest_blocks(result: DigestResult) -> list[dict]:
     """
-    DigestResult 全体を Block Kit ブロックのリストに変換する。
+    DigestResult を Block Kit ブロックに変換する。
 
     構造:
-      - ヘッダー（日付・件数）
-      - divider
-      - カテゴリ別セクション（件数順）
-      - フッター
+      [ヘッダー]
+      [🔴 重要 セクション] × high件数
+      [カテゴリ別 normal セクション]
+      [⚫ 内容薄 まとめ行]
+      [フッター]
     """
-    # 日付文字列（ゼロ埋めなし）
     dt = result.date
     date_str = f"{dt.year}年{dt.month}月{dt.day}日"
 
-    total_tokens = (
-        result.token_usage.get("input_tokens", 0)
-        + result.token_usage.get("output_tokens", 0)
-    )
+    # 重要度で分類
+    high_bms = [bm for bm in result.bookmarks if bm.importance == "high"]
+    normal_bms = [bm for bm in result.bookmarks if bm.importance == "normal"]
+    low_bms = [bm for bm in result.bookmarks if bm.importance == "low"]
+
+    # サブヘッダー用のカウント文字列
+    counts = []
+    if high_bms:
+        counts.append(f"🔴 重要 {len(high_bms)}件")
+    if normal_bms:
+        counts.append(f"🔵 通常 {len(normal_bms)}件")
+    if low_bms:
+        counts.append(f"⚫ 薄め {len(low_bms)}件")
 
     blocks: list[dict] = [
         {
             "type": "header",
-            "text": {
-                "type": "plain_text",
-                "text": f"📚 今日のX Bookmark Digest（{date_str}）",
-                "emoji": True,
-            },
+            "text": {"type": "plain_text", "text": f"📚 X Bookmark Digest｜{date_str}", "emoji": True},
         },
         {
             "type": "context",
-            "elements": [
-                {
-                    "type": "mrkdwn",
-                    "text": (
-                        f"*合計 {result.total_count} 件* ｜ "
-                        f"モデル: {result.model_used} ｜ "
-                        f"トークン: {total_tokens:,}"
-                    ),
-                }
-            ],
+            "elements": [{"type": "mrkdwn", "text": "  ".join(counts) + f"　計 {result.total_count}件"}],
         },
         {"type": "divider"},
     ]
 
-    # カテゴリ別にグループ化して件数順にソート
-    by_category: defaultdict[str, list[EnrichedBookmark]] = defaultdict(list)
-    for bm in result.bookmarks:
-        by_category[bm.category].append(bm)
+    # ── 🔴 重要 ──
+    if high_bms:
+        blocks.append({
+            "type": "section",
+            "text": {"type": "mrkdwn", "text": "*🔴 重要ピックアップ*"},
+        })
+        for bm in high_bms:
+            blocks.append(_build_high_block(bm))
+        blocks.append({"type": "divider"})
 
-    sorted_categories = sorted(
-        by_category.items(),
-        key=lambda x: len(x[1]),
-        reverse=True,
-    )
+    # ── 🔵 通常（カテゴリ別） ──
+    if normal_bms:
+        by_cat: defaultdict[str, list[EnrichedBookmark]] = defaultdict(list)
+        for bm in normal_bms:
+            by_cat[bm.category].append(bm)
 
-    for category, bms in sorted_categories:
-        blocks.extend(_build_category_blocks(category, bms))
+        # カテゴリを件数順にソート
+        sorted_cats = sorted(by_cat.items(), key=lambda x: len(x[1]), reverse=True)
+
+        for category, bms in sorted_cats:
+            # カテゴリ内でいいね数が多い順にソート
+            bms_sorted = sorted(bms, key=lambda b: b.bookmark.like_count, reverse=True)
+            lines = [_build_normal_block(bm) for bm in bms_sorted]
+            cat_text = f"*{_emoji(category)} {category}*\n" + "\n".join(lines)
+            blocks.append({"type": "section", "text": {"type": "mrkdwn", "text": cat_text[:3000]}})
+
+        blocks.append({"type": "divider"})
+
+    # ── ⚫ 内容薄 ──
+    if low_bms:
+        links = [f"<{bm.bookmark.url}|@{bm.bookmark.author_username}>" for bm in low_bms]
+        low_text = f"*⚫ 内容薄・本文なし（{len(low_bms)}件）*\n" + "  ".join(links)
+        blocks.append({"type": "section", "text": {"type": "mrkdwn", "text": low_text[:3000]}})
+        blocks.append({"type": "divider"})
 
     # フッター
     blocks.append({
         "type": "context",
-        "elements": [
-            {
-                "type": "mrkdwn",
-                "text": "_X Bookmark Digest ｜ Powered by Claude & DuckDuckGo_",
-            }
-        ],
+        "elements": [{"type": "mrkdwn", "text": "_X Bookmark Digest ｜ Powered by Claude_"}],
     })
 
     return blocks

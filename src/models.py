@@ -36,6 +36,7 @@ class EnrichedBookmark:
     bookmark: Bookmark
     category: str = "その他"
     summary: str = ""
+    importance: str = "normal"   # "high" / "normal" / "low"
     keywords: list[str] = field(default_factory=list)
     web_results: list[WebResult] = field(default_factory=list)
     enrichment_summary: str = ""

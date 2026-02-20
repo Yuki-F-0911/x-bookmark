@@ -163,6 +163,45 @@ def _extract_tweet_id_from_url(url: str) -> str:
     return match.group(1) if match else ""
 
 
+def _fetch_tweet_text_from_url(url: str) -> str:
+    """
+    ツイートURLにアクセスして og:description または twitter:description メタタグから
+    ツイート本文を取得する。取得失敗時は空文字を返す。
+    """
+    import urllib.request
+    import re as _re
+    try:
+        req = urllib.request.Request(
+            url,
+            headers={
+                "User-Agent": (
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                    "AppleWebKit/537.36 (KHTML, like Gecko) "
+                    "Chrome/120.0.0.0 Safari/537.36"
+                )
+            }
+        )
+        with urllib.request.urlopen(req, timeout=8) as resp:
+            html = resp.read(30000).decode("utf-8", errors="replace")
+
+        # og:description または twitter:description を抽出
+        for pattern in [
+            r'<meta\s+(?:property|name)=["\'](?:og|twitter):description["\']\s+content=["\'](.*?)["\']',
+            r'<meta\s+content=["\'](.*?)["\']\s+(?:property|name)=["\'](?:og|twitter):description["\']',
+        ]:
+            m = _re.search(pattern, html, _re.IGNORECASE | _re.DOTALL)
+            if m:
+                text = m.group(1)
+                # HTMLエンティティを簡易デコード
+                text = text.replace("&amp;", "&").replace("&lt;", "<").replace("&gt;", ">").replace("&#39;", "'").replace("&quot;", '"').replace("&#x27;", "'")
+                text = _re.sub(r"\s+", " ", text).strip()
+                if len(text) > 10:
+                    return text
+    except Exception:
+        pass
+    return ""
+
+
 def _load_from_csv(filepath: str) -> list[Bookmark]:
     """
     CSV形式のブックマークファイルを読み込む。
@@ -218,6 +257,20 @@ def _load_from_csv(filepath: str) -> list[Bookmark]:
                 url=url,
                 created_at=created_at,
             ))
+
+    # Text が空のものはURLから本文を補完
+    empty_count = sum(1 for bm in bookmarks if not bm.text)
+    if empty_count > 0:
+        logger.info(f"Text未取得 {empty_count} 件のツイート本文をURLから補完します...")
+        for bm in bookmarks:
+            if not bm.text and bm.url:
+                fetched = _fetch_tweet_text_from_url(bm.url)
+                if fetched:
+                    bm.text = fetched
+                    logger.info(f"  補完成功: @{bm.author_username} ({bm.text[:40]}...)")
+                else:
+                    logger.info(f"  補完失敗: @{bm.author_username} ({bm.url})")
+
     return bookmarks
 
 
