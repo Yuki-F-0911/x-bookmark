@@ -26,7 +26,7 @@ from datetime import datetime
 # ── 設定 ──────────────────────────────────────────
 WATCH_DIR = Path(os.environ.get("WATCH_DIR", Path.home() / "Downloads"))
 REPO_DIR  = Path(os.environ.get("REPO_DIR",  Path(__file__).parent))
-CSV_PATTERN = os.environ.get("CSV_PATTERN", "twitter_bookmarks*.csv")
+CSV_PATTERN = os.environ.get("CSV_PATTERN", "bookmarks*.csv")
 DEST_FILE   = REPO_DIR / "bookmarks.json"   # .jsonという名前でCSVを保存（既存の命名に合わせる）
 CHECK_INTERVAL_SEC = 10                      # 監視間隔（秒）
 # ────────────────────────────────────────────────────

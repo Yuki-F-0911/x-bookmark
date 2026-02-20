@@ -33,7 +33,7 @@ git config --global credential.helper manager
 | 変数 | デフォルト | 説明 |
 |------|-----------|------|
 | `WATCH_DIR` | `~/Downloads` | Chrome拡張がCSVを保存するフォルダ |
-| `CSV_PATTERN` | `twitter_bookmarks*.csv` | 対象ファイルのパターン |
+| `CSV_PATTERN` | `bookmarks*.csv` | 対象ファイルのパターン |
 | `REPO_DIR` | スクリプトと同じフォルダ | このリポジトリのパス |
 
 Chrome拡張が別のファイル名で保存する場合は `CSV_PATTERN` を変更してください。
