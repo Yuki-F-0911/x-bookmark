@@ -163,42 +163,103 @@ def _extract_tweet_id_from_url(url: str) -> str:
     return match.group(1) if match else ""
 
 
+def _fetch_tweet_via_syndication(tweet_id: str) -> dict:
+    """
+    Twitter Syndication APIからツイート詳細を取得する。
+    Article（長文投稿）のタイトル・プレビュー、引用ツイート、いいね数も取得可能。
+
+    Returns:
+        {"text": str, "article_title": str, "article_preview": str,
+         "like_count": int, "retweet_count": int} or 空dictで失敗
+    """
+    import urllib.request
+    import urllib.error
+
+    api_url = f"https://cdn.syndication.twimg.com/tweet-result?id={tweet_id}&token=0"
+    try:
+        req = urllib.request.Request(api_url, headers={"User-Agent": "Mozilla/5.0"})
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+    except (urllib.error.HTTPError, urllib.error.URLError, json.JSONDecodeError) as e:
+        logger.warning(f"Syndication API失敗 (ID={tweet_id}): {e}")
+        return {}
+
+    result = {
+        "text": "",
+        "article_title": "",
+        "article_preview": "",
+        "like_count": data.get("favorite_count", 0),
+        "retweet_count": data.get("retweet_count", 0),
+        "reply_count": data.get("conversation_count", 0),
+    }
+
+    # ツイート本文（t.co短縮URLを展開）
+    tweet_text = data.get("text", "")
+    for url_entity in data.get("entities", {}).get("urls", []):
+        short = url_entity.get("url", "")
+        expanded = url_entity.get("expanded_url", "")
+        if short and expanded:
+            tweet_text = tweet_text.replace(short, expanded)
+    result["text"] = tweet_text.strip()
+
+    # Article情報（長文投稿）
+    article = data.get("article")
+    if article:
+        result["article_title"] = article.get("title", "")
+        result["article_preview"] = article.get("preview_text", "")
+
+    # 引用ツイート
+    quoted = data.get("quoted_tweet")
+    if quoted:
+        qt_user = quoted.get("user", {}).get("screen_name", "")
+        qt_text = quoted.get("text", "")
+        if qt_text:
+            result["text"] += f"\n[引用: @{qt_user}] {qt_text}"
+
+    return result
+
+
 def _fetch_tweet_text_from_url(url: str) -> str:
     """
-    ツイートURLにアクセスして og:description または twitter:description メタタグから
-    ツイート本文を取得する。取得失敗時は空文字を返す。
+    ツイートURLから本文を取得する。
+    Syndication API → oEmbed API の順でフォールバック。
     """
     import urllib.request
     import re as _re
-    try:
-        req = urllib.request.Request(
-            url,
-            headers={
-                "User-Agent": (
-                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                    "AppleWebKit/537.36 (KHTML, like Gecko) "
-                    "Chrome/120.0.0.0 Safari/537.36"
-                )
-            }
-        )
-        with urllib.request.urlopen(req, timeout=8) as resp:
-            html = resp.read(30000).decode("utf-8", errors="replace")
 
-        # og:description または twitter:description を抽出
-        for pattern in [
-            r'<meta\s+(?:property|name)=["\'](?:og|twitter):description["\']\s+content=["\'](.*?)["\']',
-            r'<meta\s+content=["\'](.*?)["\']\s+(?:property|name)=["\'](?:og|twitter):description["\']',
-        ]:
-            m = _re.search(pattern, html, _re.IGNORECASE | _re.DOTALL)
-            if m:
-                text = m.group(1)
-                # HTMLエンティティを簡易デコード
-                text = text.replace("&amp;", "&").replace("&lt;", "<").replace("&gt;", ">").replace("&#39;", "'").replace("&quot;", '"').replace("&#x27;", "'")
-                text = _re.sub(r"\s+", " ", text).strip()
-                if len(text) > 10:
-                    return text
+    # 1. Syndication API（Article・引用ツイート対応）
+    tweet_id = _extract_tweet_id_from_url(url)
+    if tweet_id:
+        syn = _fetch_tweet_via_syndication(tweet_id)
+        if syn:
+            # Articleの場合はタイトル+プレビューを結合
+            if syn.get("article_title"):
+                parts = [syn["article_title"]]
+                if syn.get("article_preview"):
+                    parts.append(syn["article_preview"])
+                return " — ".join(parts)
+            text = syn.get("text", "")
+            if text and not text.startswith("https://t.co/"):
+                return text
+
+    # 2. oEmbed API（フォールバック）
+    try:
+        import html as _html
+        oembed_url = f"https://publish.twitter.com/oembed?url={urllib.request.quote(url, safe=':/?=&')}&omit_script=true"
+        req = urllib.request.Request(oembed_url, headers={"User-Agent": "Mozilla/5.0"})
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+        raw_html = _html.unescape(data.get("html", ""))
+        p_match = _re.search(r'<p[^>]*>(.*?)</p>', raw_html, _re.DOTALL)
+        text = p_match.group(1) if p_match else raw_html
+        text = _re.sub(r'<[^>]+>', '', text)
+        text = _re.sub(r'pic\.twitter\.com/\S+', '', text)
+        text = _re.split(r'—\s*', text)[0].strip()
+        if text and not text.startswith("https://t.co/") and len(text) > 10:
+            return text
     except Exception:
         pass
+
     return ""
 
 
@@ -258,18 +319,46 @@ def _load_from_csv(filepath: str) -> list[Bookmark]:
                 created_at=created_at,
             ))
 
-    # Text が空のものはURLから本文を補完
+    # Text が空のものはSyndication API→oEmbed APIで本文を補完
     empty_count = sum(1 for bm in bookmarks if not bm.text)
     if empty_count > 0:
-        logger.info(f"Text未取得 {empty_count} 件のツイート本文をURLから補完します...")
+        logger.info(f"Text未取得 {empty_count} 件のツイート本文をAPIから補完します...")
+        import time as _time
         for bm in bookmarks:
             if not bm.text and bm.url:
+                tweet_id = _extract_tweet_id_from_url(bm.url)
+                # Syndication APIから本文+メタデータを取得
+                if tweet_id:
+                    syn = _fetch_tweet_via_syndication(tweet_id)
+                    if syn:
+                        # エンゲージメント情報も補完
+                        if syn.get("like_count") and not bm.like_count:
+                            bm.like_count = syn["like_count"]
+                        if syn.get("retweet_count") and not bm.retweet_count:
+                            bm.retweet_count = syn["retweet_count"]
+                        if syn.get("reply_count") and not bm.reply_count:
+                            bm.reply_count = syn["reply_count"]
+                        # Articleの場合
+                        if syn.get("article_title"):
+                            bm.text = f"{syn['article_title']} — {syn.get('article_preview', '')}"
+                            logger.info(f"  補完成功(Article): @{bm.author_username} ({bm.text[:50]}...)")
+                            _time.sleep(0.3)
+                            continue
+                        # 通常ツイート
+                        text = syn.get("text", "")
+                        if text and not text.startswith("https://t.co/"):
+                            bm.text = text
+                            logger.info(f"  補完成功(API): @{bm.author_username} ({bm.text[:50]}...)")
+                            _time.sleep(0.3)
+                            continue
+                # フォールバック: _fetch_tweet_text_from_url
                 fetched = _fetch_tweet_text_from_url(bm.url)
                 if fetched:
                     bm.text = fetched
-                    logger.info(f"  補完成功: @{bm.author_username} ({bm.text[:40]}...)")
+                    logger.info(f"  補完成功(oEmbed): @{bm.author_username} ({bm.text[:50]}...)")
                 else:
                     logger.info(f"  補完失敗: @{bm.author_username} ({bm.url})")
+                _time.sleep(0.3)
 
     return bookmarks
 
