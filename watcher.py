@@ -104,7 +104,8 @@ def sync_remote() -> None:
 
 def push_to_github(csv_path: Path) -> bool:
     """
-    CSVをbookmarks.jsonとしてコピーしてgit push。
+    CSVを読み込み、ローカル環境でテキスト補完を行ってから
+    bookmarks.jsonとして保存してgit push。
     Returns True on success.
     """
     logger.info(f"新しいCSVを検出: {csv_path.name}")
@@ -112,9 +113,41 @@ def push_to_github(csv_path: Path) -> bool:
     # リモートから最新を取得（processed_ids.json等の競合防止）
     sync_remote()
 
-    # コピー
-    shutil.copy2(csv_path, DEST_FILE)
-    logger.info(f"コピー完了: {csv_path.name} -> {DEST_FILE.name}")
+    import json
+    # パスを通す（srcモジュールをインポートするため）
+    if str(REPO_DIR) not in sys.path:
+        sys.path.insert(0, str(REPO_DIR))
+
+    from src.bookmark_loader import load_bookmarks
+    
+    try:
+        logger.info("CSVをパースし、長文テキストをローカルで取得・補完します...")
+        # CSVから読み込み、空テキストのものはSyndication API等で補完される
+        bookmarks = load_bookmarks(str(csv_path))
+        
+        # Bookmarkオブジェクトのリストを辞書のリスト(JSON形式)に変換
+        bookmark_dicts = []
+        for bm in bookmarks:
+            bookmark_dicts.append({
+                "id": bm.id,
+                "text": bm.text,
+                "author_name": bm.author_name,
+                "author_username": bm.author_username,
+                "url": bm.url,
+                "created_at": bm.created_at.isoformat() if bm.created_at else None,
+                "like_count": bm.like_count,
+                "retweet_count": bm.retweet_count,
+                "reply_count": bm.reply_count,
+            })
+            
+        # JSONとして書き出す
+        with open(DEST_FILE, "w", encoding="utf-8") as f:
+            json.dump(bookmark_dicts, f, ensure_ascii=False, indent=2)
+            
+        logger.info(f"JSON変換・保存完了: {DEST_FILE.name} ({len(bookmarks)}件)")
+    except Exception as e:
+        logger.error(f"ブックマーク変換エラー: {e}", exc_info=True)
+        return False
 
     # git add
     code, out = run_git(["add", "bookmarks.json"])
