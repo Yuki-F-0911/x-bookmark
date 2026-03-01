@@ -434,12 +434,21 @@ def load_processed_ids(filepath: str = PROCESSED_IDS_FILE) -> set[str]:
 def save_processed_ids(ids: set[str], filepath: str = PROCESSED_IDS_FILE) -> None:
     """
     処理済みツイートIDをファイルに保存する。
-    IDが増えすぎないよう最新1000件のみ保持する。
+    IDが増えすぎないよう最新100000件のみ保持する。
     """
     existing = load_processed_ids(filepath)
     all_ids = list(existing | ids)
-    # 最新1000件に制限（IDは数値が大きいほど新しい）
-    all_ids_sorted = sorted(all_ids, reverse=True)[:1000]
+    
+    # IDを数値として評価し、降順でソート（文字列のままだと "9" > "10" になるバグを防止）
+    # 万が一数値化できないIDがあってもエラーにならないようにフォールバック
+    def _sort_key(x: str) -> int:
+        try:
+            return int(x)
+        except ValueError:
+            return 0
+            
+    # 最新100000件に制限
+    all_ids_sorted = sorted(all_ids, key=_sort_key, reverse=True)[:100000]
 
     with open(filepath, "w", encoding="utf-8") as f:
         json.dump({"ids": all_ids_sorted}, f, ensure_ascii=False, indent=2)
