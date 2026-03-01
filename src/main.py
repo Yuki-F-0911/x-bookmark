@@ -42,7 +42,7 @@ BOOKMARKS_FILE = os.environ.get("BOOKMARKS_FILE", "bookmarks.json")
 PROCESSED_IDS_FILE = os.environ.get("PROCESSED_IDS_FILE", "processed_ids.json")
 
 
-def load_env() -> dict[str, str]:
+def load_env(dry_run: bool = False) -> dict[str, str]:
     """
     環境変数を読み込む。
     .env ファイルがあれば優先的に読み込む（ローカル開発用）。
@@ -55,8 +55,10 @@ def load_env() -> dict[str, str]:
 
     required_keys = [
         "ANTHROPIC_API_KEY",
-        "SLACK_WEBHOOK_URL",
     ]
+    if not dry_run:
+        required_keys.append("SLACK_WEBHOOK_URL")
+        
     env: dict[str, str] = {}
     missing: list[str] = []
 
@@ -95,8 +97,8 @@ def run_digest(
     logger.info(f"=== X Bookmark Digest 開始: {now.strftime('%Y-%m-%d %H:%M JST')} ===")
 
     # --- 環境変数ロード ---
-    env = load_env()
-    slack_webhook_url = env["SLACK_WEBHOOK_URL"]
+    env = load_env(dry_run=dry_run)
+    slack_webhook_url = env.get("SLACK_WEBHOOK_URL", "")
     anthropic_api_key = env["ANTHROPIC_API_KEY"]
 
     try:
