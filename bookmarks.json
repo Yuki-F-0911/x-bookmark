@@ -1,10 +1,46 @@
-Text,DisplayName,Username,Timestamp,Link
-"","Kくん","@kkk_cun","2026-03-01T03:28:37.000Z","https://x.com/kkk_cun/status/2027949099325309282"
-"","ウミノAI×マーケティングのプロ","@umino_chibi","2026-02-28T22:32:48.000Z","https://x.com/umino_chibi/status/2027874656976543844"
-"","FujinAI自動化の人","@Fujin_Metaverse","2026-03-01T02:39:49.000Z","https://x.com/Fujin_Metaverse/status/2027936819086856280"
-"","テンペ","@HimazinProducer","2026-02-28T04:15:13.000Z","https://x.com/HimazinProducer/status/2027598439144727010"
-"Google Antigravityで初心者でも 月10万円を作る完全ロードマップ  この記事、ガチで全部書いた。  「AIで月10万稼ぐ」って 抽象的な話じゃない。  ・どのフォルダ構造を作るか ・何をAntigravityに打つか ・いくらで売るか  プロンプトも金額も全部載せてる。  特にヤバいのが、 5つの収益モデルを","テンペ","@HimazinProducer","2026-02-28T22:07:42.000Z","https://x.com/HimazinProducer/status/2027868340077949194"
-"【全国のAI推進派の皆様へ】 AI触ったことない人にChatGPTとかのAIツールを目の前で使って見せる機会、結構あるのでは？  僕の経験に基づく「AIの凄さがわかりやすい事例ランキング」を理由やコツと一緒に置いておく。全国のAIやDX系の営業の人とかよかったら参考に  1位： ChatGPTでの英訳","usutaku","@usutaku_channel","2023-12-26T01:06:26.000Z","https://x.com/usutaku_channel/status/1739452574988927317"
-"AIで作った動画でYouTubeの収益を得ている人が大勢います  ChatGPTを使えば超簡単に動画を作成可能  作成方法はこちら：  ブックマーク保存をおすすめします↓","あるる ChatGPT × AIツール","@chatgptair","2023-11-25T22:00:18.000Z","https://x.com/chatgptair/status/1728534101203063117"
-"Chat GPTの時代は終わりました  Google ChromeのAI機能で生産性が10倍になります  便利すぎるAI Chromeの拡張機能8選：  ブックマーク保存をおすすめします↓","あるる ChatGPT × AIツール","@chatgptair","2023-11-18T10:00:03.000Z","https://x.com/chatgptair/status/1725816125651661050"
-"""But all my races are very close to VO2max, relying almost exclusively on Carbohydrate. Why should I care about 'fat burning'?""  A very common misunderstanding is the thought that VO2max is the top of the intensity pyramid.   Your VO2max - your maximal Oxygen Uptake is the sum of","Alan Couzens","@Alan_Couzens","2023-09-26T14:01:36.000Z","https://x.com/Alan_Couzens/status/1706670358915694764"
+[
+  {
+    "id": "1739452574988927317",
+    "text": "【全国のAI推進派の皆様へ】 AI触ったことない人にChatGPTとかのAIツールを目の前で使って見せる機会、結構あるのでは？  僕の経験に基づく「AIの凄さがわかりやすい事例ランキング」を理由やコツと一緒に置いておく。全国のAIやDX系の営業の人とかよかったら参考に  1位： ChatGPTでの英訳",
+    "author_name": "usutaku",
+    "author_username": "usutaku_channel",
+    "url": "https://x.com/usutaku_channel/status/1739452574988927317",
+    "created_at": "2023-12-26T01:06:26+00:00",
+    "like_count": 0,
+    "retweet_count": 0,
+    "reply_count": 0
+  },
+  {
+    "id": "1728534101203063117",
+    "text": "AIで作った動画でYouTubeの収益を得ている人が大勢います  ChatGPTを使えば超簡単に動画を作成可能  作成方法はこちら：  ブックマーク保存をおすすめします↓",
+    "author_name": "あるる ChatGPT × AIツール",
+    "author_username": "chatgptair",
+    "url": "https://x.com/chatgptair/status/1728534101203063117",
+    "created_at": "2023-11-25T22:00:18+00:00",
+    "like_count": 0,
+    "retweet_count": 0,
+    "reply_count": 0
+  },
+  {
+    "id": "1725816125651661050",
+    "text": "Chat GPTの時代は終わりました  Google ChromeのAI機能で生産性が10倍になります  便利すぎるAI Chromeの拡張機能8選：  ブックマーク保存をおすすめします↓",
+    "author_name": "あるる ChatGPT × AIツール",
+    "author_username": "chatgptair",
+    "url": "https://x.com/chatgptair/status/1725816125651661050",
+    "created_at": "2023-11-18T10:00:03+00:00",
+    "like_count": 0,
+    "retweet_count": 0,
+    "reply_count": 0
+  },
+  {
+    "id": "1706670358915694764",
+    "text": "\"But all my races are very close to VO2max, relying almost exclusively on Carbohydrate. Why should I care about 'fat burning'?\"  A very common misunderstanding is the thought that VO2max is the top of the intensity pyramid.   Your VO2max - your maximal Oxygen Uptake is the sum of",
+    "author_name": "Alan Couzens",
+    "author_username": "Alan_Couzens",
+    "url": "https://x.com/Alan_Couzens/status/1706670358915694764",
+    "created_at": "2023-09-26T14:01:36+00:00",
+    "like_count": 0,
+    "retweet_count": 0,
+    "reply_count": 0
+  }
+]
