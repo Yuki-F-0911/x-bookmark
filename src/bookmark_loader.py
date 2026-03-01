@@ -340,8 +340,9 @@ def _load_from_csv(filepath: str) -> list[Bookmark]:
                             bm.reply_count = syn["reply_count"]
                         # Articleの場合
                         if syn.get("article_title"):
-                            bm.text = f"{syn['article_title']} — {syn.get('article_preview', '')}"
-                            logger.info(f"  補完成功(Article): @{bm.author_username} ({bm.text[:50]}...)")
+                            bm.text = f"{syn['article_title']} - {syn.get('article_preview', '')}"
+                            t_title = syn['article_title'].encode('cp932', errors='replace').decode('cp932')
+                            logger.info(f"  補完成功(Article): @{bm.author_username} ({t_title[:30]}...)")
                             _time.sleep(0.3)
                             continue
                         # 通常ツイート
