@@ -84,6 +84,7 @@ def run_digest(
     dry_run: bool = False,
     max_items: int = 30,
     skip_enrich: bool = False,
+    latest_mode: bool = False,
 ) -> None:
     """
     メインパイプラインを実行する。
@@ -92,6 +93,7 @@ def run_digest(
         bookmarks_file: ブックマーク JSON/CSV ファイルのパス
         processed_ids_file: 処理済み ID キャッシュファイルのパス
         dry_run: True の場合 Slack 送信をスキップ（テスト用）
+        latest_mode: True の場合、processed_ids を無視して最新 max_items 件を常に送信
     """
     now = datetime.now(JST)
     logger.info(f"=== X Bookmark Digest 開始: {now.strftime('%Y-%m-%d %H:%M JST')} ===")
@@ -106,20 +108,40 @@ def run_digest(
         logger.info(f"ブックマークファイルを読み込みます: {bookmarks_file}")
         all_bookmarks = load_bookmarks(bookmarks_file)
 
-        # --- 2. 差分処理（処理済みをスキップ）---
-        processed_ids = load_processed_ids(processed_ids_file)
-        bookmarks = filter_new_bookmarks(all_bookmarks, processed_ids)
+        # --- 2. ブックマーク選択 ---
+        if latest_mode:
+            # 最新モード: created_at降順でソートし、上位 max_items 件を取得
+            bookmarks = sorted(
+                all_bookmarks,
+                key=lambda bm: bm.created_at or datetime.min.replace(tzinfo=timezone.utc),
+                reverse=True,
+            )[:max_items]
+            # 前回と同じセットなら送信スキップ
+            current_ids = {bm.id for bm in bookmarks}
+            cache_file = os.environ.get("DIGEST_CACHE_FILE", "data/digest_cache.json")
+            if os.path.exists(cache_file):
+                with open(cache_file, "r", encoding="utf-8") as f:
+                    cache = json.load(f)
+                cached_ids = {bm["id"] for bm in cache.get("bookmarks", [])}
+                if current_ids == cached_ids:
+                    logger.info("最新30件に変化なし。送信をスキップします。")
+                    sys.exit(0)
+            logger.info(f"最新モード: {len(bookmarks)} 件を処理します")
+        else:
+            # 差分モード: 処理済みをスキップ
+            processed_ids = load_processed_ids(processed_ids_file)
+            bookmarks = filter_new_bookmarks(all_bookmarks, processed_ids)
 
-        if not bookmarks:
-            logger.info("新規ブックマークがありません。処理を終了します。")
-            sys.exit(0)
+            if not bookmarks:
+                logger.info("新規ブックマークがありません。処理を終了します。")
+                sys.exit(0)
 
-        # 上限件数に切り詰め（新しい順に max_items 件のみ処理）
-        if len(bookmarks) > max_items:
-            logger.info(f"{len(bookmarks)} 件中、直近 {max_items} 件のみ処理します")
-            bookmarks = bookmarks[:max_items]
+            # 上限件数に切り詰め（新しい順に max_items 件のみ処理）
+            if len(bookmarks) > max_items:
+                logger.info(f"{len(bookmarks)} 件中、直近 {max_items} 件のみ処理します")
+                bookmarks = bookmarks[:max_items]
 
-        logger.info(f"新規ブックマーク {len(bookmarks)} 件を処理します")
+        logger.info(f"ブックマーク {len(bookmarks)} 件を処理します")
 
         # --- 3. Anthropic クライアント初期化 ---
         anthropic_client = Anthropic(api_key=anthropic_api_key)
@@ -255,6 +277,12 @@ if __name__ == "__main__":
         default=os.environ.get("SKIP_ENRICH", "").lower() in ("1", "true"),
         help="Web検索エンリッチメントをスキップして高速化",
     )
+    parser.add_argument(
+        "--latest",
+        action="store_true",
+        default=os.environ.get("LATEST_MODE", "").lower() in ("1", "true"),
+        help="処理済みIDを無視し、常に最新N件を送信する",
+    )
     args = parser.parse_args()
 
     # --no-cache の場合は空のキャッシュファイルとして扱う
@@ -269,4 +297,5 @@ if __name__ == "__main__":
         dry_run=args.dry_run,
         max_items=args.max_items,
         skip_enrich=args.skip_enrich,
+        latest_mode=args.latest,
     )

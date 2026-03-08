@@ -70,7 +70,7 @@ jobs:
           MAX_ITEMS: ${{ github.event.inputs.max_items || '30' }}
           SKIP_ENRICH: ${{ github.event.inputs.skip_enrich || 'false' }}
         run: |
-          ARGS=""
+          ARGS="--latest"
           if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
             ARGS="$ARGS --dry-run"
           fi
