@@ -38,8 +38,8 @@ logger = get_logger(__name__)
 JST = timezone(timedelta(hours=9))
 
 # デフォルトのブックマークファイルパス
-BOOKMARKS_FILE = os.environ.get("BOOKMARKS_FILE", "bookmarks.json")
-PROCESSED_IDS_FILE = os.environ.get("PROCESSED_IDS_FILE", "processed_ids.json")
+BOOKMARKS_FILE = os.environ.get("BOOKMARKS_FILE", "data/bookmarks.json")
+PROCESSED_IDS_FILE = os.environ.get("PROCESSED_IDS_FILE", "data/processed_ids.json")
 
 
 def load_env(dry_run: bool = False) -> dict[str, str]:
@@ -178,7 +178,7 @@ def run_digest(
 
 def _save_digest_cache(result: DigestResult) -> None:
     """Slack Bot が参照できるようダイジェスト内容をJSONファイルに保存する"""
-    cache_file = os.environ.get("DIGEST_CACHE_FILE", "digest_cache.json")
+    cache_file = os.environ.get("DIGEST_CACHE_FILE", "data/digest_cache.json")
     data = {
         "date": result.date.strftime("%Y-%m-%d"),
         "total_count": result.total_count,

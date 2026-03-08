@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Academic Paper Reviewer</title>
+    <!-- Google Fonts: Merriweather for academic feel, Inter for UI -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Merriweather:wght@300;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+
+<body>
+    <div class="app-wrapper">
+        <header>
+            <h1>AI Academic Paper Reviewer</h1>
+            <p>一流教授レベルの6段階構造化査読フローで論文を徹底解剖</p>
+        </header>
+
+        <main>
+            <section class="search-section">
+                <input type="text" id="query-input"
+                    placeholder="Search topics (e.g., 'large language models', 'crispr')" />
+                <button id="search-btn">Search Papers</button>
+            </section>
+
+            <div id="loader" class="loader-container" style="display: none;">
+                <div class="spinner"></div>
+                <p id="loader-text">Searching arXiv...</p>
+            </div>
+
+            <!-- 検索結果一覧 -->
+            <section class="results-list" id="results-list" style="display: none;">
+                <h2>Search Results</h2>
+                <div id="papers-container"></div>
+            </section>
+
+            <!-- 個別レビュー画面 -->
+            <section class="review-panel" id="review-panel" style="display: none;">
+                <button id="back-btn" class="secondary-btn">← Back to Results</button>
+                <div id="review-content" class="markdown-body"></div>
+
+                <div class="zotero-action">
+                    <button id="zotero-btn" class="accent-btn" style="display: none;">Save to Zotero</button>
+                    <span id="zotero-status"></span>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+
+</html>

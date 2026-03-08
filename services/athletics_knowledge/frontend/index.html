@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Athletics Knowledge Service</title>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <!-- Marked.js for Markdown parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Athletics Knowledge</h1>
+            <p>陸上競技の最新の知見とニュースをプレミアムな記事でお届けします。</p>
+        </header>
+
+        <main>
+            <section class="search-section">
+                <input type="text" id="topic-input" placeholder="テーマを入力 (例: マラソン, スプリント)" value="マラソン">
+                <button id="fetch-btn">記事を生成</button>
+            </section>
+
+            <section class="result-section" id="result-container" style="display: none;">
+                <div class="loader" id="loader" style="display: none;"></div>
+                <div class="article-content" id="article-output"></div>
+            </section>
+        </main>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

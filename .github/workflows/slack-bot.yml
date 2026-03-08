@@ -42,7 +42,7 @@ jobs:
       - name: Check digest cache exists
         id: check_cache
         run: |
-          if [ -f "digest_cache.json" ]; then
+          if [ -f "data/digest_cache.json" ]; then
             echo "cache_exists=true" >> $GITHUB_OUTPUT
             echo "✅ ダイジェストキャッシュが見つかりました"
           else

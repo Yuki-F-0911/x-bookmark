@@ -31,9 +31,9 @@ from datetime import datetime
 
 # ── 設定 ──────────────────────────────────────────
 WATCH_DIR = Path(os.environ.get("WATCH_DIR", Path.home() / "Downloads"))
-REPO_DIR  = Path(os.environ.get("REPO_DIR",  Path(__file__).parent))
+REPO_DIR  = Path(os.environ.get("REPO_DIR",  Path(__file__).parent.parent))
 CSV_PATTERN = os.environ.get("CSV_PATTERN", "bookmarks*.csv")
-DEST_FILE   = REPO_DIR / "bookmarks.json"
+DEST_FILE   = REPO_DIR / "data" / "bookmarks.json"
 HASH_FILE   = REPO_DIR / ".last_csv_hash"
 CHECK_INTERVAL_SEC = 10
 # ────────────────────────────────────────────────────
@@ -44,7 +44,7 @@ logging.basicConfig(
     datefmt="%Y-%m-%d %H:%M:%S",
     handlers=[
         logging.StreamHandler(sys.stdout),
-        logging.FileHandler(REPO_DIR / "watcher.log", encoding="utf-8"),
+        logging.FileHandler(REPO_DIR / "data" / "watcher.log", encoding="utf-8"),
     ],
 )
 logger = logging.getLogger(__name__)
@@ -150,7 +150,7 @@ def push_to_github(csv_path: Path) -> bool:
         return False
 
     # git add
-    code, out = run_git(["add", "bookmarks.json"])
+    code, out = run_git(["add", "data/bookmarks.json"])
     if code != 0:
         logger.error(f"git add 失敗: {out}")
         return False

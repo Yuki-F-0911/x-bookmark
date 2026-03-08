@@ -4,7 +4,7 @@ on:
   # bookmarks.json が更新されたら即座に実行
   push:
     paths:
-      - "bookmarks.json"
+      - "data/bookmarks.json"
 
   # 毎日 JST 7:00（UTC 22:00 前日）にも実行
   schedule:
@@ -51,14 +51,14 @@ jobs:
       - name: Check bookmarks.json exists and is not empty
         id: check_bookmarks
         run: |
-          if [ ! -f "bookmarks.json" ]; then
-            echo "bookmarks.json が存在しません。スキップします。"
+          if [ ! -f "data/bookmarks.json" ]; then
+            echo "data/bookmarks.json が存在しません。スキップします。"
             echo "skip=true" >> $GITHUB_OUTPUT
-          elif [ ! -s "bookmarks.json" ]; then
-            echo "bookmarks.json が空です。スキップします。"
+          elif [ ! -s "data/bookmarks.json" ]; then
+            echo "data/bookmarks.json が空です。スキップします。"
             echo "skip=true" >> $GITHUB_OUTPUT
           else
-            echo "bookmarks.json を確認しました。処理を続行します。"
+            echo "data/bookmarks.json を確認しました。処理を続行します。"
             echo "skip=false" >> $GITHUB_OUTPUT
           fi
 
@@ -77,7 +77,7 @@ jobs:
           if [ "${{ github.event.inputs.no_cache }}" = "true" ]; then
             ARGS="$ARGS --no-cache"
           fi
-          python -m src.main $ARGS
+          BOOKMARKS_FILE=data/bookmarks.json PROCESSED_IDS_FILE=data/processed_ids.json DIGEST_CACHE_FILE=data/digest_cache.json python -m src.main $ARGS
 
       # 処理済みIDキャッシュ＆ダイジェストキャッシュを自動コミットして保存
       - name: Save caches
@@ -85,7 +85,7 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add processed_ids.json digest_cache.json || true
+          git add data/processed_ids.json data/digest_cache.json || true
           git diff --staged --quiet || git commit -m "chore: update caches [skip ci]"
           git push || true
 

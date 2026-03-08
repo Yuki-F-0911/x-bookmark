@@ -25,7 +25,7 @@ logger = get_logger(__name__)
 JST = timezone(timedelta(hours=9))
 
 # ダイジェストデータを保存するファイル（daily-digestワークフローが生成）
-DIGEST_CACHE_FILE = os.environ.get("DIGEST_CACHE_FILE", "digest_cache.json")
+DIGEST_CACHE_FILE = os.environ.get("DIGEST_CACHE_FILE", "data/digest_cache.json")
 
 
 def load_env() -> dict[str, str]:

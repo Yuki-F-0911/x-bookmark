@@ -16,7 +16,24 @@ build/
 
 # Watcher
 .last_csv_hash
-watcher.log
+data/watcher.log
+data/*.log
+data/daily_pipeline_*.log
+
+# Generated outputs
+newsletters/
+data/merged_sources_today.json
+data/auto_fetched_articles.json
+data/auto_business_topics.json
+data/latest20.json
+data/old_bookmarks.json
+data/msg*.json
+data/slack_*.json
+data/test_syn.json
+data/*_logs.txt
+
+# Debug scripts
+debug/
 
 # Cloudflare
 slack_gateway/.wrangler/

@@ -28,7 +28,7 @@ sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
 
 SYNDICATION_URL = "https://cdn.syndication.twimg.com/tweet-result?id={}&token=0"
 OEMBED_URL = "https://publish.twitter.com/oembed?url={}&omit_script=true"
-BOOKMARKS_PATH = Path(__file__).parent / "bookmarks.json"
+BOOKMARKS_PATH = Path(__file__).parent.parent / "data" / "bookmarks.json"
 
 
 def extract_tweet_id(url: str) -> str | None:
@@ -115,22 +115,23 @@ def extract_text_from_oembed(data: dict) -> str:
 
 
 def load_bookmarks(path: Path, limit: int = 20) -> list[dict]:
-    """bookmarks.json(CSV形式)を読み込み、新しい順にソートして返す"""
+    """bookmarks.json(JSON形式)を読み込み、新しい順にソートして返す"""
     if not path.exists():
         print(f"エラー: {path} が見つかりません", file=sys.stderr)
         sys.exit(1)
 
-    bookmarks = []
     with open(path, "r", encoding="utf-8") as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            bookmarks.append({
-                "text": row.get("Text", ""),
-                "display_name": row.get("DisplayName", ""),
-                "username": row.get("Username", ""),
-                "timestamp": row.get("Timestamp", ""),
-                "link": row.get("Link", ""),
-            })
+        data = json.load(f)
+
+    bookmarks = []
+    for item in data:
+        bookmarks.append({
+            "text": item.get("text", ""),
+            "display_name": item.get("author_name", ""),
+            "username": item.get("author_username", ""),
+            "timestamp": item.get("created_at", ""),
+            "link": item.get("url", ""),
+        })
 
     bookmarks.sort(key=lambda x: x["timestamp"], reverse=True)
     return bookmarks[:limit]
