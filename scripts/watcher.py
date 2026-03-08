@@ -50,13 +50,17 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def find_latest_csv() -> Path | None:
-    """Downloadsフォルダから最新のCSVファイルを探す"""
+def find_all_csvs() -> list[Path]:
+    """Downloadsフォルダから全てのbookmarks CSVファイルを返す（更新日時降順）"""
     pattern = str(WATCH_DIR / CSV_PATTERN)
     files = glob.glob(pattern)
-    if not files:
-        return None
-    return Path(max(files, key=os.path.getmtime))
+    return sorted([Path(f) for f in files], key=os.path.getmtime, reverse=True)
+
+
+def find_latest_csv() -> Path | None:
+    """Downloadsフォルダから最新のCSVファイルを探す"""
+    csvs = find_all_csvs()
+    return csvs[0] if csvs else None
 
 
 def file_hash(path: Path) -> str:
@@ -65,6 +69,17 @@ def file_hash(path: Path) -> str:
     with open(path, "rb") as f:
         for chunk in iter(lambda: f.read(8192), b""):
             h.update(chunk)
+    return h.hexdigest()
+
+
+def combined_hash(paths: list[Path]) -> str:
+    """複数ファイルの合算ハッシュを返す（ファイル名ソート順で安定化）"""
+    h = hashlib.sha256()
+    for p in sorted(paths, key=lambda x: x.name):
+        h.update(p.name.encode("utf-8"))
+        with open(p, "rb") as f:
+            for chunk in iter(lambda: f.read(8192), b""):
+                h.update(chunk)
     return h.hexdigest()
 
 
@@ -102,13 +117,15 @@ def sync_remote() -> None:
         logger.warning(f"リモート同期に失敗（後続で再試行）: {out}")
 
 
-def push_to_github(csv_path: Path) -> bool:
+def push_to_github(csv_paths: list[Path]) -> bool:
     """
-    CSVを読み込み、ローカル環境でテキスト補完を行ってから
+    全CSVをマージして読み込み、ローカル環境でテキスト補完を行ってから
     bookmarks.jsonとして保存してgit push。
     Returns True on success.
     """
-    logger.info(f"新しいCSVを検出: {csv_path.name}")
+    logger.info(f"CSVファイル {len(csv_paths)} 件をマージ処理します")
+    for p in csv_paths:
+        logger.info(f"  - {p.name}")
 
     # リモートから最新を取得（processed_ids.json等の競合防止）
     sync_remote()
@@ -119,32 +136,47 @@ def push_to_github(csv_path: Path) -> bool:
         sys.path.insert(0, str(REPO_DIR))
 
     from src.bookmark_loader import load_bookmarks
-    
+
     try:
-        logger.info("CSVをパースし、長文テキストをローカルで取得・補完します...")
-        # CSVから読み込み、空テキストのものはSyndication API等で補完される
-        bookmarks = load_bookmarks(str(csv_path))
-        
-        # Bookmarkオブジェクトのリストを辞書のリスト(JSON形式)に変換
-        bookmark_dicts = []
-        for bm in bookmarks:
-            bookmark_dicts.append({
-                "id": bm.id,
-                "text": bm.text,
-                "author_name": bm.author_name,
-                "author_username": bm.author_username,
-                "url": bm.url,
-                "created_at": bm.created_at.isoformat() if bm.created_at else None,
-                "like_count": bm.like_count,
-                "retweet_count": bm.retweet_count,
-                "reply_count": bm.reply_count,
-            })
-            
+        logger.info("全CSVをパースし、マージ・重複除去・テキスト補完を行います...")
+
+        # 全CSVを読み込んでマージ（IDで重複除去、テキストがある方を優先）
+        merged: dict[str, dict] = {}
+        for csv_path in csv_paths:
+            try:
+                bookmarks = load_bookmarks(str(csv_path))
+                for bm in bookmarks:
+                    if bm.id not in merged:
+                        merged[bm.id] = {
+                            "id": bm.id,
+                            "text": bm.text,
+                            "author_name": bm.author_name,
+                            "author_username": bm.author_username,
+                            "url": bm.url,
+                            "created_at": bm.created_at.isoformat() if bm.created_at else None,
+                            "like_count": bm.like_count,
+                            "retweet_count": bm.retweet_count,
+                            "reply_count": bm.reply_count,
+                        }
+                    elif bm.text and not merged[bm.id].get("text"):
+                        # 既存エントリにテキストがなければ上書き
+                        merged[bm.id]["text"] = bm.text
+            except Exception as e:
+                logger.warning(f"CSV読み込みエラー ({csv_path.name}): {e}")
+                continue
+
+        # created_at降順でソート
+        bookmark_dicts = sorted(
+            merged.values(),
+            key=lambda x: x.get("created_at") or "",
+            reverse=True,
+        )
+
         # JSONとして書き出す
         with open(DEST_FILE, "w", encoding="utf-8") as f:
             json.dump(bookmark_dicts, f, ensure_ascii=False, indent=2)
-            
-        logger.info(f"JSON変換・保存完了: {DEST_FILE.name} ({len(bookmarks)}件)")
+
+        logger.info(f"JSON変換・保存完了: {DEST_FILE.name} ({len(bookmark_dicts)}件, {len(csv_paths)}ファイルからマージ)")
     except Exception as e:
         logger.error(f"ブックマーク変換エラー: {e}", exc_info=True)
         return False
@@ -204,14 +236,15 @@ def main():
 
     while True:
         try:
-            csv_path = find_latest_csv()
+            csv_paths = find_all_csvs()
 
-            if csv_path is not None:
-                current_hash = file_hash(csv_path)
+            if csv_paths:
+                current_hash = combined_hash(csv_paths)
 
                 if current_hash != last_hash:
-                    # 内容が変わったCSVを検出
-                    success = push_to_github(csv_path)
+                    # いずれかのCSVが変わった（追加・更新）
+                    logger.info(f"CSVの変更を検出（{len(csv_paths)}ファイル）")
+                    success = push_to_github(csv_paths)
                     if success:
                         save_last_hash(current_hash)
                         last_hash = current_hash
