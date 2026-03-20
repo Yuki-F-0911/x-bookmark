@@ -1,5 +1,82 @@
 [
   {
+    "id": "2034819565180657857",
+    "text": "【速報】Claude Codeが遂にOpenClaw化する。  Claude本当に毎日アプデあってヤバい…  ・TelegramとDiscordに対応（MCPベース） ・双方向通信：Claudeの返答もアプリで受信 ・v2.1.80以上＋claude. aiログインで利用可 ・セキュリティ：送信者ホワイトリスト制  ↓詳細",
+    "author_name": "チャエン | デジライズ CEO《重要AIニュースを毎日最速で発信》",
+    "author_username": "masahirochaen",
+    "url": "https://x.com/masahirochaen/status/2034819565180657857",
+    "created_at": "2026-03-20T02:29:24+00:00",
+    "like_count": 0,
+    "retweet_count": 0,
+    "reply_count": 0
+  },
+  {
+    "id": "2034773854007255426",
+    "text": "【迷ってる間に全部入りになった】Google AI Studioが\"作る\"を1画面に統合した日 - 「またGoogleから何か出たのか」。\n3月19日のニュースを見て、そう思った人は多いはずです。\nGemini、AI",
+    "author_name": "KAWAI",
+    "author_username": "kawai_design",
+    "url": "https://x.com/kawai_design/status/2034773854007255426",
+    "created_at": "2026-03-19T23:27:45+00:00",
+    "like_count": 293,
+    "retweet_count": 0,
+    "reply_count": 2
+  },
+  {
+    "id": "2034466595595256130",
+    "text": "Claude code使ったら完全自動で3万稼げてた件。 - なんかClaude codeでThreads完全自動で回してたら、\n2週間で3万の利益を作ってましたwww（ちなみに承認率保証ある案件なので、まあほぼ確定で30,000円入ってきます🥺）\n \n「流石に、こんなちょろくていいのか？🥺」",
+    "author_name": "シロウ",
+    "author_username": "shiro_life0",
+    "url": "https://x.com/shiro_life0/status/2034466595595256130",
+    "created_at": "2026-03-19T03:06:49+00:00",
+    "like_count": 6383,
+    "retweet_count": 0,
+    "reply_count": 18
+  },
+  {
+    "id": "2034390479597691135",
+    "text": "時給1万円が狙える海外リモートワークランキング    1位 Mercor  2位 Alignerr  3位 Outlier  ▼それぞれの詳しい解説▼",
+    "author_name": "鈴木孝輔（こうすけ）｜海外リモートを当たり前に",
+    "author_username": "kosuke_dekasegi",
+    "url": "https://x.com/kosuke_dekasegi/status/2034390479597691135",
+    "created_at": "2026-03-18T22:04:22+00:00",
+    "like_count": 0,
+    "retweet_count": 0,
+    "reply_count": 0
+  },
+  {
+    "id": "2034218352265359722",
+    "text": "『OpenClaw』が人気すぎてやばいw 【GitHubのAIリポジトリ Top12】 GitHubの全体的な人気度と、 GitHubのスター数に基づいて選ばれた AIの人気順を紹介します。",
+    "author_name": "ガガロットAI",
+    "author_username": "gagarotai200",
+    "url": "https://x.com/gagarotai200/status/2034218352265359722",
+    "created_at": "2026-03-18T10:40:23+00:00",
+    "like_count": 0,
+    "retweet_count": 0,
+    "reply_count": 0
+  },
+  {
+    "id": "2034138677471748394",
+    "text": "革命 「NotebookLM」を使えば 『YouTube』チャンネルの裏側を数分で 丸裸にして『月収200万』くらい 稼げる悪用厳禁の手法なんだけど",
+    "author_name": "ガガロット",
+    "author_username": "gagarot200",
+    "url": "https://x.com/gagarot200/status/2034138677471748394",
+    "created_at": "2026-03-18T05:23:47+00:00",
+    "like_count": 0,
+    "retweet_count": 0,
+    "reply_count": 0
+  },
+  {
+    "id": "2033995802050523386",
+    "text": "17歳で作ったAIアプリを2年足らずで月8.5億円の収益まで成長させて売却した天才の話 - 「AIアプリなんて、どうせすぐ真似される。」\nそんな固定観念を打ち砕く、衝撃的なニュースが飛び込んできた。\n主人公は、アメリカの若き天才起業家、Zach Yadegari（ザック・ヤデガリ）氏。",
+    "author_name": "テツメモ｜AI図解×検証｜Newsletter",
+    "author_username": "tetumemo",
+    "url": "https://x.com/tetumemo/status/2033995802050523386",
+    "created_at": "2026-03-17T19:56:03+00:00",
+    "like_count": 28,
+    "retweet_count": 0,
+    "reply_count": 1
+  },
+  {
     "id": "2033468309468037503",
     "text": "【保存】知ってると差がつくClaude Code/Cowork活用事例まとめ  Claude Codeをエンジニア用ツールだと思ってる人もったいないです。  業務自動化、SNS投稿自動化、freee・Salesforce連携、コンサル資料自動生成、確定申告など、成果が出てる事例を厳選。  スレッドで随時更新。ブックマーク推奨です",
     "author_name": "チャエン | デジライズ CEO《重要AIニュースを毎日最速で発信》",
@@ -17,7 +94,7 @@
     "author_username": "hata_AI_master",
     "url": "https://x.com/hata_AI_master/status/2033379053877825841",
     "created_at": "2026-03-16T03:05:19+00:00",
-    "like_count": 633,
+    "like_count": 655,
     "retweet_count": 0,
     "reply_count": 3
   },
@@ -39,7 +116,7 @@
     "author_username": "sukh_saroy",
     "url": "https://x.com/sukh_saroy/status/2033258927664898427",
     "created_at": "2026-03-15T19:07:59+00:00",
-    "like_count": 621,
+    "like_count": 622,
     "retweet_count": 0,
     "reply_count": 24
   },
@@ -53,6 +130,28 @@
     "like_count": 0,
     "retweet_count": 0,
     "reply_count": 0
+  },
+  {
+    "id": "2033075652098928771",
+    "text": "【学生必見】『完全無料』で使える神AIツール70個を全て完全解説 - 前提をお話しします。\n今オラはAIにほぼ全ての作業を自動化しています。\nSNS投稿、資料をまとめる、調べ物、資料作成など全て\nこれらの自動化が全て学生なら無料で出来てしまう\n使わない手はない。",
+    "author_name": "ガガロットAI",
+    "author_username": "gagarotai200",
+    "url": "https://x.com/gagarotai200/status/2033075652098928771",
+    "created_at": "2026-03-15T06:59:42+00:00",
+    "like_count": 719,
+    "retweet_count": 0,
+    "reply_count": 0
+  },
+  {
+    "id": "2033049693249507828",
+    "text": "０円で１０万円稼ぐ方法 - 嘘っぽく聞こえるけど実際に私や私のまわりで１０万いったのを教えるよ。\n\n普通の主婦でもできるんだから再現性ありすぎるので気を付けてね\n\nぶっちゃけ月10万は、正直むずかしくないよ。\nただし",
+    "author_name": "みちぽ｜Ｘの先生",
+    "author_username": "michipo5",
+    "url": "https://x.com/michipo5/status/2033049693249507828",
+    "created_at": "2026-03-15T05:16:33+00:00",
+    "like_count": 224,
+    "retweet_count": 0,
+    "reply_count": 1
   },
   {
     "id": "2032810384118395340",
@@ -77,13 +176,46 @@
     "reply_count": 3
   },
   {
+    "id": "2032378370147656068",
+    "text": "コメダ珈琲の正体。なぜ、客に長居されるのに日本一儲かっているのか？ - つい、寄っちゃうんですよね。コメダ。\n私も今日は自宅近くにある店舗へ行ってきたところです。\n\nシロノワールを頬張りながら、この異様な空間について考えました。",
+    "author_name": "キャリア孔明",
+    "author_username": "career_koumei",
+    "url": "https://x.com/career_koumei/status/2032378370147656068",
+    "created_at": "2026-03-13T08:48:57+00:00",
+    "like_count": 1306,
+    "retweet_count": 0,
+    "reply_count": 12
+  },
+  {
+    "id": "2032098388960035233",
+    "text": "🚀 AIで11個アプリを作り月1000万円以上稼ぐ21歳の戦略を全部解剖する話 - 「プログラミングができないと、アプリで稼ぐのは無理」 そう思っているなら、この話を聞いてほしい。\nErnesto Lopezは21歳のアメリカ人だ。",
+    "author_name": "テツメモ｜AI図解×検証｜Newsletter",
+    "author_username": "tetumemo",
+    "url": "https://x.com/tetumemo/status/2032098388960035233",
+    "created_at": "2026-03-12T14:16:25+00:00",
+    "like_count": 810,
+    "retweet_count": 0,
+    "reply_count": 2
+  },
+  {
+    "id": "2031833010685817140",
+    "text": "🚀18歳ながらAIを使って複数アプリを作り月300万円以上稼ぐ「George氏」 - 「プログラミングなど、1ミリも理解していない」\nそう言い切る18歳の大学生が、AIを駆使して月収330万円を稼ぎ出している。\nこの衝撃的な事実は、これからの「個人の稼ぎ方」が根本から変わることを示唆している。",
+    "author_name": "ジャバ・ザ・ハットリ←←",
+    "author_username": "nodenodenode1",
+    "url": "https://x.com/nodenodenode1/status/2031833010685817140",
+    "created_at": "2026-03-11T20:41:54+00:00",
+    "like_count": 547,
+    "retweet_count": 0,
+    "reply_count": 0
+  },
+  {
     "id": "2031651945665147293",
     "text": "【入れるだけで効率12倍】Raycastで叶える爆速作業 - Macで作業が遅い人の多くは、能力が低いわけではありません。集中力が足りないわけでもない。単純に、毎日同じ操作を何十回も遠回りしているだけです。\nアプリを探す。\nブラウザを開く。\nよく使うURLに飛ぶ。",
     "author_name": "らっこ | noteで2億円",
     "author_username": "Xxx_note_xx",
     "url": "https://x.com/Xxx_note_xx/status/2031651945665147293",
     "created_at": "2026-03-11T08:42:24+00:00",
-    "like_count": 213,
+    "like_count": 214,
     "retweet_count": 0,
     "reply_count": 0
   },
@@ -160,7 +292,7 @@
     "author_username": "_map_universe_",
     "url": "https://x.com/_map_universe_/status/2031280820384825436",
     "created_at": "2026-03-10T08:07:41+00:00",
-    "like_count": 2925,
+    "like_count": 3055,
     "retweet_count": 0,
     "reply_count": 7
   },
@@ -171,7 +303,7 @@
     "author_username": "Xxx_note_xx",
     "url": "https://x.com/Xxx_note_xx/status/2031258715719086239",
     "created_at": "2026-03-10T06:39:51+00:00",
-    "like_count": 1093,
+    "like_count": 1092,
     "retweet_count": 0,
     "reply_count": 7
   },
@@ -281,7 +413,7 @@
     "author_username": "0xfene",
     "url": "https://x.com/0xfene/status/2030928836137783547",
     "created_at": "2026-03-09T08:49:02+00:00",
-    "like_count": 1491,
+    "like_count": 1492,
     "retweet_count": 0,
     "reply_count": 4
   },
@@ -314,7 +446,7 @@
     "author_username": "kosuke_dekasegi",
     "url": "https://x.com/kosuke_dekasegi/status/2030412685737865465",
     "created_at": "2026-03-07T22:38:02+00:00",
-    "like_count": 706,
+    "like_count": 705,
     "retweet_count": 0,
     "reply_count": 11
   },
@@ -336,7 +468,7 @@
     "author_username": "midori_tatsuta",
     "url": "https://x.com/midori_tatsuta/status/2029841918902030617",
     "created_at": "2026-03-06T08:50:00+00:00",
-    "like_count": 288,
+    "like_count": 289,
     "retweet_count": 0,
     "reply_count": 3
   },
@@ -347,7 +479,7 @@
     "author_username": "seto_note_labo",
     "url": "https://x.com/seto_note_labo/status/2029443046614708660",
     "created_at": "2026-03-05T06:25:02+00:00",
-    "like_count": 1153,
+    "like_count": 1152,
     "retweet_count": 0,
     "reply_count": 5
   },
@@ -402,7 +534,7 @@
     "author_username": "ai_jitan",
     "url": "https://x.com/ai_jitan/status/2029032869738496135",
     "created_at": "2026-03-04T03:15:08+00:00",
-    "like_count": 14371,
+    "like_count": 14383,
     "retweet_count": 0,
     "reply_count": 59
   },
@@ -534,9 +666,9 @@
     "author_username": "quronekox",
     "url": "https://x.com/quronekox/status/2028010759393837521",
     "created_at": "2026-03-01T07:33:38+00:00",
-    "like_count": 1140,
+    "like_count": 1139,
     "retweet_count": 0,
-    "reply_count": 2
+    "reply_count": 1
   },
   {
     "id": "2027991616544194797",
@@ -545,7 +677,7 @@
     "author_username": "gagarotai200",
     "url": "https://x.com/gagarotai200/status/2027991616544194797",
     "created_at": "2026-03-01T06:17:34+00:00",
-    "like_count": 468,
+    "like_count": 467,
     "retweet_count": 0,
     "reply_count": 4
   },
@@ -611,7 +743,7 @@
     "author_username": "umino_chibi",
     "url": "https://x.com/umino_chibi/status/2027874656976543844",
     "created_at": "2026-02-28T22:32:48+00:00",
-    "like_count": 689,
+    "like_count": 690,
     "retweet_count": 0,
     "reply_count": 9
   },
@@ -655,7 +787,7 @@
     "author_username": "gura105",
     "url": "https://x.com/gura105/status/2027730617912463823",
     "created_at": "2026-02-28T13:00:27+00:00",
-    "like_count": 1472,
+    "like_count": 1474,
     "retweet_count": 0,
     "reply_count": 4
   },
@@ -677,7 +809,7 @@
     "author_username": "Solomaker_dev",
     "url": "https://x.com/Solomaker_dev/status/2027710115756073199",
     "created_at": "2026-02-28T11:38:59+00:00",
-    "like_count": 1994,
+    "like_count": 1995,
     "retweet_count": 0,
     "reply_count": 10
   },
@@ -688,7 +820,7 @@
     "author_username": "tetumemo",
     "url": "https://x.com/tetumemo/status/2027690209790599243",
     "created_at": "2026-02-28T10:19:53+00:00",
-    "like_count": 550,
+    "like_count": 551,
     "retweet_count": 0,
     "reply_count": 4
   },
@@ -831,7 +963,7 @@
     "author_username": "yusuke_post",
     "url": "https://x.com/yusuke_post/status/2027348800331972703",
     "created_at": "2026-02-27T11:43:14+00:00",
-    "like_count": 1239,
+    "like_count": 1241,
     "retweet_count": 0,
     "reply_count": 10
   },
@@ -842,7 +974,7 @@
     "author_username": "wad0427",
     "url": "https://x.com/wad0427/status/2027343805352235443",
     "created_at": "2026-02-27T11:23:24+00:00",
-    "like_count": 1171,
+    "like_count": 1172,
     "retweet_count": 0,
     "reply_count": 4
   },
@@ -853,7 +985,7 @@
     "author_username": "genkaidokusho",
     "url": "https://x.com/genkaidokusho/status/2027343243894215144",
     "created_at": "2026-02-27T11:21:10+00:00",
-    "like_count": 2237,
+    "like_count": 2235,
     "retweet_count": 0,
     "reply_count": 18
   },
@@ -908,7 +1040,7 @@
     "author_username": "awakia",
     "url": "https://x.com/awakia/status/2027305851267252366",
     "created_at": "2026-02-27T08:52:35+00:00",
-    "like_count": 812,
+    "like_count": 811,
     "retweet_count": 0,
     "reply_count": 1
   },
@@ -919,7 +1051,7 @@
     "author_username": "Solomaker_dev",
     "url": "https://x.com/Solomaker_dev/status/2027283066906153341",
     "created_at": "2026-02-27T07:22:02+00:00",
-    "like_count": 1328,
+    "like_count": 1327,
     "retweet_count": 0,
     "reply_count": 2
   },
@@ -963,7 +1095,7 @@
     "author_username": "L_go_mrk",
     "url": "https://x.com/L_go_mrk/status/2027212536362447346",
     "created_at": "2026-02-27T02:41:47+00:00",
-    "like_count": 666,
+    "like_count": 664,
     "retweet_count": 0,
     "reply_count": 1
   },
@@ -1007,9 +1139,9 @@
     "author_username": "ErnestoSOFTWARE",
     "url": "https://x.com/ErnestoSOFTWARE/status/2027105511569809899",
     "created_at": "2026-02-26T19:36:30+00:00",
-    "like_count": 1659,
+    "like_count": 1660,
     "retweet_count": 0,
-    "reply_count": 77
+    "reply_count": 78
   },
   {
     "id": "2027045290075926816",
@@ -1018,7 +1150,7 @@
     "author_username": "SuguruKun_ai",
     "url": "https://x.com/SuguruKun_ai/status/2027045290075926816",
     "created_at": "2026-02-26T15:37:12+00:00",
-    "like_count": 1198,
+    "like_count": 1201,
     "retweet_count": 0,
     "reply_count": 7
   },
@@ -1073,7 +1205,7 @@
     "author_username": "oku_hashi",
     "url": "https://x.com/oku_hashi/status/2026956791335043556",
     "created_at": "2026-02-26T09:45:32+00:00",
-    "like_count": 244,
+    "like_count": 266,
     "retweet_count": 0,
     "reply_count": 6
   },
@@ -1084,7 +1216,7 @@
     "author_username": "ADHDHSP249834",
     "url": "https://x.com/ADHDHSP249834/status/2026937383913169255",
     "created_at": "2026-02-26T08:28:25+00:00",
-    "like_count": 14724,
+    "like_count": 14735,
     "retweet_count": 0,
     "reply_count": 56
   },
@@ -1106,7 +1238,7 @@
     "author_username": "ishida_chatgpt",
     "url": "https://x.com/ishida_chatgpt/status/2026893782948675759",
     "created_at": "2026-02-26T05:35:10+00:00",
-    "like_count": 315,
+    "like_count": 314,
     "retweet_count": 0,
     "reply_count": 3
   },
@@ -1161,7 +1293,7 @@
     "author_username": "L_go_mrk",
     "url": "https://x.com/L_go_mrk/status/2026620801777127459",
     "created_at": "2026-02-25T11:30:26+00:00",
-    "like_count": 445,
+    "like_count": 444,
     "retweet_count": 0,
     "reply_count": 1
   },
@@ -1172,7 +1304,7 @@
     "author_username": "tetumemo",
     "url": "https://x.com/tetumemo/status/2026616269836099678",
     "created_at": "2026-02-25T11:12:26+00:00",
-    "like_count": 1652,
+    "like_count": 1709,
     "retweet_count": 0,
     "reply_count": 10
   },
@@ -1271,7 +1403,7 @@
     "author_username": "ritsuto_NFT_Vt",
     "url": "https://x.com/ritsuto_NFT_Vt/status/2026238463100555750",
     "created_at": "2026-02-24T10:11:09+00:00",
-    "like_count": 362,
+    "like_count": 364,
     "retweet_count": 0,
     "reply_count": 10
   },
@@ -1293,7 +1425,7 @@
     "author_username": "osaruproducer",
     "url": "https://x.com/osaruproducer/status/2026220904896995675",
     "created_at": "2026-02-24T09:01:23+00:00",
-    "like_count": 777,
+    "like_count": 781,
     "retweet_count": 0,
     "reply_count": 6
   },
@@ -1322,7 +1454,7 @@
   {
     "id": "2025540218867384354",
     "text": "【1日10分で自動化】「Google Antigravity」が作る、怠け者のためのAI副業自動化ルート - 「AIを使えば、SNS運用は楽になる」\nそう聞いてChatGPTを触り始めたのに、気がつけば毎日何時間もパソコンにへばりついて、プロンプトを打ち続ける「デジタル作業員」になっていませんか？\n誰もが陥る罠。",
-    "author_name": "ココア＠凡人会社員でもAI副業で月100万",
+    "author_name": "ココア@AI設計者",
     "author_username": "cocoaxxx7",
     "url": "https://x.com/cocoaxxx7/status/2025540218867384354",
     "created_at": "2026-02-22T11:56:35+00:00",
@@ -1337,7 +1469,7 @@
     "author_username": "gura105",
     "url": "https://x.com/gura105/status/2025524398745411957",
     "created_at": "2026-02-22T10:53:43+00:00",
-    "like_count": 769,
+    "like_count": 771,
     "retweet_count": 0,
     "reply_count": 5
   },
@@ -1425,9 +1557,9 @@
     "author_username": "nakanishi_ds",
     "url": "https://x.com/nakanishi_ds/status/2025073371491565892",
     "created_at": "2026-02-21T05:01:30+00:00",
-    "like_count": 5141,
+    "like_count": 5140,
     "retweet_count": 0,
-    "reply_count": 31
+    "reply_count": 30
   },
   {
     "id": "2025070827994300875",
@@ -1447,7 +1579,7 @@
     "author_username": "Fujin_Metaverse",
     "url": "https://x.com/Fujin_Metaverse/status/2025062763803119628",
     "created_at": "2026-02-21T04:19:21+00:00",
-    "like_count": 573,
+    "like_count": 572,
     "retweet_count": 0,
     "reply_count": 4
   },
@@ -1458,7 +1590,7 @@
     "author_username": "umino_chibi",
     "url": "https://x.com/umino_chibi/status/2025037288208826783",
     "created_at": "2026-02-21T02:38:07+00:00",
-    "like_count": 958,
+    "like_count": 957,
     "retweet_count": 0,
     "reply_count": 2
   },
@@ -1513,7 +1645,7 @@
     "author_username": "xauxbt",
     "url": "https://x.com/xauxbt/status/2024822664649752977",
     "created_at": "2026-02-20T12:25:17+00:00",
-    "like_count": 2598,
+    "like_count": 2596,
     "retweet_count": 0,
     "reply_count": 10
   },
@@ -1568,7 +1700,7 @@
     "author_username": "moreinteraction",
     "url": "https://x.com/moreinteraction/status/2024754355430449355",
     "created_at": "2026-02-20T07:53:51+00:00",
-    "like_count": 2152,
+    "like_count": 2151,
     "retweet_count": 0,
     "reply_count": 15
   },
@@ -1623,7 +1755,7 @@
     "author_username": "Majin_AppSheet",
     "url": "https://x.com/Majin_AppSheet/status/2024599131663323501",
     "created_at": "2026-02-19T21:37:02+00:00",
-    "like_count": 1092,
+    "like_count": 1093,
     "retweet_count": 0,
     "reply_count": 6
   },
@@ -1700,7 +1832,7 @@
     "author_username": "ryuji_affiliate",
     "url": "https://x.com/ryuji_affiliate/status/2024432529324069060",
     "created_at": "2026-02-19T10:35:01+00:00",
-    "like_count": 628,
+    "like_count": 627,
     "retweet_count": 0,
     "reply_count": 4
   },
@@ -1733,7 +1865,7 @@
     "author_username": "ken_tbdz",
     "url": "https://x.com/ken_tbdz/status/2024398983888802060",
     "created_at": "2026-02-19T08:21:43+00:00",
-    "like_count": 1263,
+    "like_count": 1264,
     "retweet_count": 0,
     "reply_count": 6
   },
@@ -1777,7 +1909,7 @@
     "author_username": "yume_ai123",
     "url": "https://x.com/yume_ai123/status/2024001670200651978",
     "created_at": "2026-02-18T06:02:56+00:00",
-    "like_count": 1770,
+    "like_count": 1772,
     "retweet_count": 0,
     "reply_count": 15
   },
@@ -1854,7 +1986,7 @@
     "author_username": "kajikent",
     "url": "https://x.com/kajikent/status/2023588912002941418",
     "created_at": "2026-02-17T02:42:47+00:00",
-    "like_count": 443,
+    "like_count": 442,
     "retweet_count": 0,
     "reply_count": 1
   },
@@ -1920,7 +2052,7 @@
     "author_username": "xauxbt",
     "url": "https://x.com/xauxbt/status/2023361133055471742",
     "created_at": "2026-02-16T11:37:41+00:00",
-    "like_count": 2051,
+    "like_count": 2056,
     "retweet_count": 0,
     "reply_count": 10
   },
@@ -2030,7 +2162,7 @@
     "author_username": "Majin_AppSheet",
     "url": "https://x.com/Majin_AppSheet/status/2022970651792052571",
     "created_at": "2026-02-15T09:46:03+00:00",
-    "like_count": 3352,
+    "like_count": 3349,
     "retweet_count": 0,
     "reply_count": 18
   },
@@ -2063,7 +2195,7 @@
     "author_username": "gagarot200",
     "url": "https://x.com/gagarot200/status/2022825287965434204",
     "created_at": "2026-02-15T00:08:25+00:00",
-    "like_count": 1692,
+    "like_count": 1691,
     "retweet_count": 0,
     "reply_count": 16
   },
@@ -2107,9 +2239,9 @@
     "author_username": "halukik_0520",
     "url": "https://x.com/halukik_0520/status/2022334661314396475",
     "created_at": "2026-02-13T15:38:51+00:00",
-    "like_count": 2489,
+    "like_count": 2785,
     "retweet_count": 0,
-    "reply_count": 7
+    "reply_count": 9
   },
   {
     "id": "2022218149358350432",
@@ -2129,7 +2261,7 @@
     "author_username": "mercarioji",
     "url": "https://x.com/mercarioji/status/2021833566506954800",
     "created_at": "2026-02-12T06:27:40+00:00",
-    "like_count": 8217,
+    "like_count": 8241,
     "retweet_count": 0,
     "reply_count": 37
   },
@@ -2151,7 +2283,7 @@
     "author_username": "chankostin",
     "url": "https://x.com/chankostin/status/2021490508586156127",
     "created_at": "2026-02-11T07:44:29+00:00",
-    "like_count": 274,
+    "like_count": 273,
     "retweet_count": 0,
     "reply_count": 3
   },
@@ -2162,7 +2294,7 @@
     "author_username": "taichi_we",
     "url": "https://x.com/taichi_we/status/2021459757547257950",
     "created_at": "2026-02-11T05:42:17+00:00",
-    "like_count": 5585,
+    "like_count": 5584,
     "retweet_count": 0,
     "reply_count": 8
   },
@@ -2217,7 +2349,7 @@
     "author_username": "tetumemo",
     "url": "https://x.com/tetumemo/status/2020942907918909493",
     "created_at": "2026-02-09T19:28:31+00:00",
-    "like_count": 2133,
+    "like_count": 2135,
     "retweet_count": 0,
     "reply_count": 12
   },
@@ -2228,7 +2360,7 @@
     "author_username": "Shuhei_Ohno",
     "url": "https://x.com/Shuhei_Ohno/status/2020716233822437669",
     "created_at": "2026-02-09T04:27:47+00:00",
-    "like_count": 9399,
+    "like_count": 9406,
     "retweet_count": 0,
     "reply_count": 19
   },
@@ -2250,9 +2382,9 @@
     "author_username": "taichi_we",
     "url": "https://x.com/taichi_we/status/2019969673949798900",
     "created_at": "2026-02-07T03:01:14+00:00",
-    "like_count": 12996,
+    "like_count": 12983,
     "retweet_count": 0,
-    "reply_count": 19
+    "reply_count": 18
   },
   {
     "id": "2019716190290215257",
@@ -2272,7 +2404,7 @@
     "author_username": "ktknd",
     "url": "https://x.com/ktknd/status/2019556331154469009",
     "created_at": "2026-02-05T23:38:45+00:00",
-    "like_count": 4382,
+    "like_count": 4381,
     "retweet_count": 0,
     "reply_count": 9
   },
@@ -2327,7 +2459,7 @@
     "author_username": "kloss_xyz",
     "url": "https://x.com/kloss_xyz/status/2018097344345223455",
     "created_at": "2026-02-01T23:01:15+00:00",
-    "like_count": 1205,
+    "like_count": 1207,
     "retweet_count": 0,
     "reply_count": 65
   },
@@ -2349,7 +2481,7 @@
     "author_username": "shtrchkw",
     "url": "https://x.com/shtrchkw/status/2017494580573442188",
     "created_at": "2026-01-31T07:06:05+00:00",
-    "like_count": 1559,
+    "like_count": 1557,
     "retweet_count": 0,
     "reply_count": 2
   },
@@ -2426,7 +2558,7 @@
     "author_username": "minnano_copy",
     "url": "https://x.com/minnano_copy/status/2016415214363935174",
     "created_at": "2026-01-28T07:37:04+00:00",
-    "like_count": 1660,
+    "like_count": 1671,
     "retweet_count": 0,
     "reply_count": 19
   },
@@ -2448,9 +2580,9 @@
     "author_username": "Jumpei_Mitsui",
     "url": "https://x.com/Jumpei_Mitsui/status/2015052151475876322",
     "created_at": "2026-01-24T13:20:45+00:00",
-    "like_count": 99010,
+    "like_count": 98989,
     "retweet_count": 0,
-    "reply_count": 167
+    "reply_count": 166
   },
   {
     "id": "2013077460561355169",
@@ -3313,7 +3445,7 @@
   {
     "id": "1890043341339033844",
     "text": "cursorでアプリ開発してるんだけどcurlなるコマンドが便利すぎた。開発中の機能をすぐにデバッグできる。そしてついにアプリの基本機能が全て実装できたのでここからデザインとバグの修正。",
-    "author_name": "るるむ | 爆速AI開発",
+    "author_name": "るるむ | AI組織開発",
     "author_username": "AI_Studenttt",
     "url": "https://x.com/AI_Studenttt/status/1890043341339033844",
     "created_at": "2025-02-13T14:20:22+00:00",
@@ -3570,7 +3702,7 @@
     "author_username": "0xikkun",
     "url": "https://x.com/0xikkun/status/1863164728325054655",
     "created_at": "2024-12-01T10:14:21+00:00",
-    "like_count": 2268,
+    "like_count": 2267,
     "retweet_count": 0,
     "reply_count": 1
   },
@@ -3775,7 +3907,7 @@
   {
     "id": "1795946812026900529",
     "text": "有名大学が公開しているビジネススキルが上がる有益資料をまとめました。各URLはスレッドへ。  ① 解像度を上げる (東大) ② 統計入門 (京大) ③ 150 分で学ぶ高校数学 (東大) ④ Python講座 (筑波) ⑤ ChatGPT活用術 (慶應) ⑥ 英会話講座 (外語大) ⑦ CS50 (ハーバード) ⑧ 仮説思考(東大)",
-    "author_name": "かずなり | 生成AI×ビジネスハック",
+    "author_name": "かずなり | 生成AI活用×大喜利",
     "author_username": "MacopeninSUTABA",
     "url": "https://x.com/MacopeninSUTABA/status/1795946812026900529",
     "created_at": "2024-05-29T22:34:21+00:00",
@@ -3797,7 +3929,7 @@
   {
     "id": "1787991960927817759",
     "text": "東京大学が公開しているビジネス能力が上がる資料をまとめました。各URLはスレッドへ  ① わかりやすい説明のための10の鉄則 ② 解像度を上げる ③ ChatGPTの活用 ④ Python入門 ⑤ 150分で学ぶ高校数学の基礎 ⑥ ビジネス仮説検証 ⑦ AWS入門 ⑧ データサイエンス入門",
-    "author_name": "かずなり | 生成AI×ビジネスハック",
+    "author_name": "かずなり | 生成AI活用×大喜利",
     "author_username": "MacopeninSUTABA",
     "url": "https://x.com/MacopeninSUTABA/status/1787991960927817759",
     "created_at": "2024-05-07T23:44:37+00:00",
