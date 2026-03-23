@@ -25,15 +25,11 @@ on:
         description: "処理する最大件数（デフォルト: 30）"
         type: string
         default: "30"
-      skip_enrich:
-        description: "Web検索補足をスキップ（高速化）"
-        type: boolean
-        default: false
 
 jobs:
   digest:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 10
 
     steps:
       - name: Checkout repository
@@ -58,17 +54,14 @@ jobs:
             echo "data/bookmarks.json が空です。スキップします。"
             echo "skip=true" >> $GITHUB_OUTPUT
           else
-            echo "data/bookmarks.json を確認しました。処理を続行します。"
             echo "skip=false" >> $GITHUB_OUTPUT
           fi
 
       - name: Run digest
         if: steps.check_bookmarks.outputs.skip != 'true'
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           MAX_ITEMS: ${{ github.event.inputs.max_items || '30' }}
-          SKIP_ENRICH: ${{ github.event.inputs.skip_enrich || 'false' }}
         run: |
           ARGS="--latest"
           if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
@@ -79,7 +72,6 @@ jobs:
           fi
           BOOKMARKS_FILE=data/bookmarks.json PROCESSED_IDS_FILE=data/processed_ids.json DIGEST_CACHE_FILE=data/digest_cache.json python -m src.main $ARGS
 
-      # 処理済みIDキャッシュ＆ダイジェストキャッシュを自動コミットして保存
       - name: Save caches
         if: success() && github.event.inputs.dry_run != 'true'
         run: |
@@ -89,7 +81,6 @@ jobs:
           git diff --staged --quiet || git commit -m "chore: update caches [skip ci]"
           git push || true
 
-      # 失敗時に Slack にエラー通知
       - name: Notify failure to Slack
         if: failure()
         run: |
